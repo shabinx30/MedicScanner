@@ -11,20 +11,20 @@ const Home = () => {
     return (
         <main className="flex flex-col gap-8 pt-[3em] justify-between items-center font-sans h-screen">
             <header className="flex flex-col items-center gap-4">
-                <h1 className="text-4xl font-semibold flex gap-3 text-center uppercase">
+                <h1 className="text-2xl md:text-4xl font-semibold flex gap-3 text-center uppercase">
                     <GiMedicines className="text-[#41f5ff]" />
                     Medic Scanner
                 </h1>
-                <h6 className="w-[75%] text-center text-[#9b9b9b]">
+                <h6 className="w-[75%] text-center text-sm md:text-base text-[#9b9b9b] leading-[1.1] md:leading-tight">
                     This Application helps you to find whether your medicine
                     have enough quality to take or not.
                 </h6>
             </header>
-            <section>
+            <section className="max-w-[calc(100vw-1em)]">
                 <div className="border border-gray-300 dark:border-[#4b4b4b] py-4 rounded-4xl px-4">
                     <Link
                         href="/camera"
-                        className="bg-[#41f5ff] font-semibold flex justify-between gap-[10em] items-center w-full cursor-pointer text-black px-5 py-6 rounded-2xl"
+                        className="bg-[#41f5ff] font-semibold flex justify-between gap-[6em] md:gap-[10em] items-center w-full cursor-pointer text-black px-5 py-6 rounded-2xl"
                     >
                         <div className="flex gap-3">
                             <FaCamera size={22} />
