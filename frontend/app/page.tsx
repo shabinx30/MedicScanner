@@ -63,7 +63,7 @@ const Home = () => {
                         />
                     </div>
                     <button
-                        className="text-base cursor-pointer flex justify-center items-center gap-2 bg-[#41f5ff] text-black py-2 rounded-2xl mt-4"
+                        className="text-base cursor-pointer flex justify-center items-center gap-1 bg-[#41f5ff] text-black py-2 rounded-2xl mt-4"
                         type="submit"
                     >
                         Check Medicine
@@ -77,7 +77,7 @@ const Home = () => {
                     <br />
                 </p>
                 <Link
-                    className="hover:underline hover:text-white text-center flex justify-center items-center gap-2"
+                    className="hover:underline hover:text-white text-center flex justify-center items-center gap-1"
                     href="https://cdsco.gov.in/opencms/opencms/en/Notifications/nsq-drugs/"
                 >
                     Center Drug Standard Organization
@@ -85,7 +85,7 @@ const Home = () => {
                 </Link>
             </footer>
             <Image
-                className="hidden md:block absolute top-1/4 left-1/9"
+                className="hidden md:block absolute top-1/4 left-1/9 w-[7em]"
                 src="/star.avif"
                 alt="star"
                 width={100}
