@@ -1,65 +1,105 @@
+import Link from "next/link";
+import { GiMedicines } from "react-icons/gi";
+import { HiExternalLink } from "react-icons/hi";
+import { SlArrowRight } from "react-icons/sl";
+import { IoCloudUploadOutline } from "react-icons/io5";
+import { FaCamera } from "react-icons/fa";
+import { TbRosetteDiscountCheck } from "react-icons/tb";
 import Image from "next/image";
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+const Home = () => {
+    return (
+        <main className="flex flex-col gap-8 pt-[3em] justify-between items-center font-sans h-screen">
+            <header className="flex flex-col items-center gap-4">
+                <h1 className="text-4xl font-semibold flex gap-3 text-center uppercase">
+                    <GiMedicines className="text-[#41f5ff]" />
+                    Medic Scanner
+                </h1>
+                <h6 className="w-[75%] text-center text-[#9b9b9b]">
+                    This Application helps you to find whether your medicine
+                    have enough quality to take or not.
+                </h6>
+            </header>
+            <section>
+                <div className="border border-gray-300 dark:border-[#4b4b4b] py-4 rounded-4xl px-4">
+                    <Link
+                        href="/camera"
+                        className="bg-[#41f5ff] font-semibold flex justify-between gap-[10em] items-center w-full cursor-pointer text-black px-5 py-6 rounded-2xl"
+                    >
+                        <div className="flex gap-3">
+                            <FaCamera size={22} />
+                            Open Camera
+                        </div>
+                        <SlArrowRight />
+                    </Link>
+                    <div className="mt-2 bg-gray-100 dark:bg-[#2b2b2b] flex justify-center gap-3 px-5 py-4 rounded-2xl items-center">
+                        <IoCloudUploadOutline size={21} />
+                        Upload Image
+                    </div>
+                </div>
+                <div className="relative my-6">
+                    <p className="absolute text-sm right-1/2 bottom-1/2 translate-x-1/2 translate-y-1/2 bg-background px-1">
+                        OR
+                    </p>
+                    <hr className="h-px border-0 bg-linear-to-r from-transparent via-gray-300 dark:via-[#4b4b4b] to-transparent" />
+                </div>
+                <form className="text-sm border border-gray-300 dark:border-[#4b4b4b] flex flex-col gap-4 pt-6 pb-4 rounded-4xl px-4">
+                    <div className="flex flex-col gap-1">
+                        <label htmlFor="product_name">Product Name</label>
+                        <input
+                            className="border border-gray-400 dark:border-[#4b4b4b] rounded-lg outline-none focus:border-[#41f5ff] p-2"
+                            id="product_name"
+                            placeholder="e.g. Paracetamol 500mg"
+                            type="text"
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <label htmlFor="batch_no">Batch Number</label>
+                        <input
+                            className="border border-gray-400 dark:border-[#4b4b4b] rounded-lg outline-none focus:border-[#41f5ff] p-2"
+                            id="batch_no"
+                            placeholder="e.g. BN3L244"
+                            type="text"
+                        />
+                    </div>
+                    <button
+                        className="text-base cursor-pointer flex justify-center items-center gap-2 bg-[#41f5ff] text-black py-2 rounded-2xl mt-4"
+                        type="submit"
+                    >
+                        Check Medicine
+                        <TbRosetteDiscountCheck size={18} />
+                    </button>
+                </form>
+            </section>
+            <footer className="mb-[1em] text-xs text-center text-[#9b9b9b]">
+                <p className="text-center">
+                    All the data we use for this validation is collected from{" "}
+                    <br />
+                </p>
+                <Link
+                    className="hover:underline hover:text-white text-center flex justify-center items-center gap-2"
+                    href="https://cdsco.gov.in/opencms/opencms/en/Notifications/nsq-drugs/"
+                >
+                    Center Drug Standard Organization
+                    <HiExternalLink size={16} />
+                </Link>
+            </footer>
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+                className="hidden md:block absolute top-1/4 left-1/9"
+                src="/star.avif"
+                alt="star"
+                width={100}
+                height={100}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
-}
+            <Image
+                className="hidden md:block absolute bottom-1/4 right-1/9"
+                src="/dimond.avif"
+                alt="star"
+                width={100}
+                height={100}
+            />
+        </main>
+    );
+};
+
+export default Home;
