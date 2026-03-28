@@ -83,21 +83,49 @@ const Camera = () => {
 
     useEffect(() => {
         stopLoop();
-        // if()
-    }, [phase]);
+        if (!isCvLoaded) return;
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+        if (!video || !canvas) return;
+
+        const tryStart = () => {
+            // Sync canvas to actual video dimensions
+            if (video.videoWidth > 0 && video.videoHeight > 0) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                if (phase === "detecting") startDetectionLoop("front");
+                if (phase === "waiting_flip") startDetectionLoop("flip");
+            } else {
+                // Video not ready yet, wait for it
+                video.addEventListener("loadeddata", () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    if (phase === "detecting") startDetectionLoop("front");
+                    if (phase === "waiting_flip") startDetectionLoop("flip");
+                }, { once: true });
+            }
+        };
+
+        tryStart();
+    }, [phase, isCvLoaded]);
 
     const runChecks = (cv: any, src: any) => {
         const frameArea = src.rows * src.cols;
         const gray = new cv.Mat();
         cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
 
-        // Blur Check
+        // Blur Check (use variance of Laplacian as sharpness metric)
         const laplacian = new cv.Mat();
         cv.Laplacian(gray, laplacian, cv.CV_64F);
-        const meanLap = cv.mean(laplacian)[0];
+        const meanStd = new cv.Mat();
+        const stdDev = new cv.Mat();
+        cv.meanStdDev(laplacian, meanStd, stdDev);
+        const variance = Math.pow(stdDev.doubleAt(0, 0), 2);
         laplacian.delete();
+        meanStd.delete();
+        stdDev.delete();
 
-        if (meanLap < 80) {
+        if (variance < 100) {
             gray.delete();
             return { pass: false, reason: "hold_steady" as Guidance };
         }
@@ -122,7 +150,7 @@ const Camera = () => {
 
         // Object in frame + size check
         const blurred = new cv.Mat();
-        cv.GaussianBlur(gray, blurred, new cv.size(5, 5), 0);
+        cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
         const edges = new cv.Mat();
         cv.Canny(blurred, edges, 50, 150);
 
@@ -138,8 +166,8 @@ const Camera = () => {
 
         let maxArea = 0;
         for (let i = 0; i < contours.size(); i++) {
-            const area = cv.contoursArea(contours.get(i));
-            if (maxArea > area) {
+            const area = cv.contourArea(contours.get(i));
+            if (area > maxArea) {
                 maxArea = area;
             }
         }
@@ -164,7 +192,7 @@ const Camera = () => {
 
         const video = videoRef.current;
         const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d")!;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
 
         const loop = () => {
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -293,7 +321,11 @@ const Camera = () => {
                         Loding Camera Engine...
                     </h3>
                 )}
-                <p className="absolute right-1/2 translate-x-1/2 bottom-4 z-30">{guidance !== 'none' ? GUIDANCE_TEXT[guidance] : PHASE_TEXT[phase]}</p>
+                <p className="absolute right-1/2 translate-x-1/2 bottom-4 z-30">
+                    {guidance !== "none"
+                        ? GUIDANCE_TEXT[guidance]
+                        : PHASE_TEXT[phase]}
+                </p>
                 <motion.div
                     initial={{ opacity: 1 }}
                     animate={{ opacity: isCvLoaded ? 0 : 1 }}
@@ -309,6 +341,7 @@ const Camera = () => {
                         // style={{ transform: "scaleX(-1)" }}
                         className="w-screen h-screen rounded-4xl object-cover object-center"
                     ></video>
+                    <canvas ref={canvasRef} className="hidden"></canvas>
                 </div>
             </div>
             <Script
