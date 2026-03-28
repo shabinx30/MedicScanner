@@ -2,47 +2,11 @@
 
 import Link from "next/link";
 import Script from "next/script";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { motion } from "framer-motion";
 import { useAppContext } from "@/context/AppContext";
-
-/** Cross-browser fullscreen request (handles Safari) */
-function requestFullscreen(el: HTMLElement): Promise<void> {
-    if (el.requestFullscreen) {
-        return el.requestFullscreen();
-    }
-    // Safari
-    const webkitEl = el as HTMLElement & {
-        webkitRequestFullscreen?: () => Promise<void>;
-    };
-    if (webkitEl.webkitRequestFullscreen) {
-        return webkitEl.webkitRequestFullscreen();
-    }
-    return Promise.reject(new Error("Fullscreen API not supported"));
-}
-
-/** Cross-browser exit fullscreen */
-function exitFullscreen(): Promise<void> {
-    if (document.exitFullscreen) {
-        return document.exitFullscreen();
-    }
-    const doc = document as Document & {
-        webkitExitFullscreen?: () => Promise<void>;
-    };
-    if (doc.webkitExitFullscreen) {
-        return doc.webkitExitFullscreen();
-    }
-    return Promise.resolve();
-}
-
-/** Check if any element is currently fullscreen (cross-browser) */
-function isFullscreen(): boolean {
-    const doc = document as Document & {
-        webkitFullscreenElement?: Element | null;
-    };
-    return !!(document.fullscreenElement || doc.webkitFullscreenElement);
-}
+import useFullScreen from "@/libs/FullScreen";
 
 const Camera = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -50,29 +14,7 @@ const Camera = () => {
     const cameraPage = useRef<HTMLDivElement>(null);
     const { isCvLoaded, setCvLoaded } = useAppContext();
 
-    const tryFullscreen = useCallback(() => {
-        if (!cameraPage.current || isFullscreen()) return;
-
-        requestFullscreen(cameraPage.current).catch(() => {
-            const handler = () => {
-                if (cameraPage.current && !isFullscreen()) {
-                    requestFullscreen(cameraPage.current).catch((error) => {
-                        console.log(error);
-                    });
-                }
-                document.removeEventListener("click", handler, true);
-                document.removeEventListener("touchstart", handler, true);
-            };
-            document.addEventListener("click", handler, {
-                capture: true,
-                once: true,
-            });
-            document.addEventListener("touchstart", handler, {
-                capture: true,
-                once: true,
-            });
-        });
-    }, []);
+    const { tryFullscreen } = useFullScreen(cameraPage);
 
     useEffect(() => {
         (async () => {
