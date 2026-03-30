@@ -154,12 +154,10 @@ const Camera = () => {
         stddev.delete();
 
         // console.log(variance)
-        if (variance < 50) {
+        if (variance < 65) {
             gray.delete();
             return { pass: false, reason: "hold_steady" as Guidance };
         }
-
-
 
         // Object in frame + size check
         // const blurred = new cv.Mat();
@@ -335,11 +333,15 @@ const Camera = () => {
                         Loading Camera Engine...
                     </h3>
                 )}
-                <p className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-black p-4">
+                <motion.p
+                    layout
+                    transition={{ duration: 0.1, ease: "easeIn" }}
+                    className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-black p-4"
+                >
                     {guidance !== "none"
                         ? GUIDANCE_TEXT[guidance]
                         : PHASE_TEXT[phase]}
-                </p>
+                </motion.p>
 
                 <div className="absolute z-30 right-0 bottom-1/2 translate-y-1/2">
                     {images.length ? (
