@@ -97,12 +97,17 @@ const Camera = () => {
                 if (phase === "waiting_flip") startDetectionLoop("flip");
             } else {
                 // Video not ready yet, wait for it
-                video.addEventListener("loadeddata", () => {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    if (phase === "detecting") startDetectionLoop("front");
-                    if (phase === "waiting_flip") startDetectionLoop("flip");
-                }, { once: true });
+                video.addEventListener(
+                    "loadeddata",
+                    () => {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        if (phase === "detecting") startDetectionLoop("front");
+                        if (phase === "waiting_flip")
+                            startDetectionLoop("flip");
+                    },
+                    { once: true },
+                );
             }
         };
 
@@ -113,22 +118,6 @@ const Camera = () => {
         const frameArea = src.rows * src.cols;
         const gray = new cv.Mat();
         cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-
-        // Blur Check (use variance of Laplacian as sharpness metric)
-        const laplacian = new cv.Mat();
-        cv.Laplacian(gray, laplacian, cv.CV_64F);
-        const meanStd = new cv.Mat();
-        const stdDev = new cv.Mat();
-        cv.meanStdDev(laplacian, meanStd, stdDev);
-        const variance = Math.pow(stdDev.doubleAt(0, 0), 2);
-        laplacian.delete();
-        meanStd.delete();
-        stdDev.delete();
-
-        if (variance < 100) {
-            gray.delete();
-            return { pass: false, reason: "hold_steady" as Guidance };
-        }
 
         // Brighness check
         const brightness = cv.mean(gray)[0];
@@ -148,42 +137,67 @@ const Camera = () => {
             return { pass: false, reason: "glare" as Guidance };
         }
 
-        // Object in frame + size check
-        const blurred = new cv.Mat();
-        cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
-        const edges = new cv.Mat();
-        cv.Canny(blurred, edges, 50, 150);
+        // Blur Check (use variance of Laplacian as sharpness metric)
+        const laplacian = new cv.Mat();
+        cv.Laplacian(gray, laplacian, cv.CV_64F);
 
-        const contours = new cv.MatVector();
-        const hierarchy = new cv.Mat();
-        cv.findContours(
-            edges,
-            contours,
-            hierarchy,
-            cv.RETR_EXTERNAL,
-            cv.CHAIN_APPROX_SIMPLE,
-        );
+        const mean = new cv.Mat();
+        const stddev = new cv.Mat();
 
-        let maxArea = 0;
-        for (let i = 0; i < contours.size(); i++) {
-            const area = cv.contourArea(contours.get(i));
-            if (area > maxArea) {
-                maxArea = area;
-            }
+        cv.meanStdDev(laplacian, mean, stddev);
+
+        // variance = stddev²
+        const variance = Math.pow(stddev.doubleAt(0, 0), 2);
+
+        laplacian.delete();
+        mean.delete();
+        stddev.delete();
+
+        // console.log(variance)
+        if (variance < 50) {
+            gray.delete();
+            return { pass: false, reason: "hold_steady" as Guidance };
         }
 
-        contours.delete();
-        hierarchy.delete();
-        blurred.delete();
-        edges.delete();
+
+
+        // Object in frame + size check
+        // const blurred = new cv.Mat();
+        // cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
+        // const edges = new cv.Mat();
+        // cv.Canny(blurred, edges, 50, 150);
+
+        // const contours = new cv.MatVector();
+        // const hierarchy = new cv.Mat();
+        // cv.findContours(
+        //     edges,
+        //     contours,
+        //     hierarchy,
+        //     cv.RETR_EXTERNAL,
+        //     cv.CHAIN_APPROX_SIMPLE,
+        // );
+
+        // let maxArea = 0;
+        // for (let i = 0; i < contours.size(); i++) {
+        //     const area = cv.contourArea(contours.get(i));
+        //     if (area > maxArea) {
+        //         maxArea = area;
+        //     }
+        // }
+
+        // contours.delete();
+        // hierarchy.delete();
+        // blurred.delete();
+        // edges.delete();
         gray.delete();
 
-        if (maxArea < frameArea * 0.08)
-            return { pass: false, reason: "no_object" as Guidance };
-        if (maxArea < frameArea * 0.25)
-            return { pass: false, reason: "move_closer" as Guidance };
+        // if (maxArea < frameArea * 0.08)
+        //     return { pass: false, reason: "no_object" as Guidance };
+        // if (maxArea < frameArea * 0.25)
+        //     return { pass: false, reason: "move_closer" as Guidance };
 
-        return { pass: true, reason: "none" as Guidance };
+        // return { pass: true, reason: "none" as Guidance };
+        return { pass: false, reason: "none" as Guidance };
     };
 
     const startDetectionLoop = (mode: "front" | "flip") => {
@@ -318,19 +332,36 @@ const Camera = () => {
                 </Link>
                 {!isCvLoaded && (
                     <h3 className="absolute z-30 bottom-1/2 right-1/2 translate-y-1/2 translate-x-1/2">
-                        Loding Camera Engine...
+                        Loading Camera Engine...
                     </h3>
                 )}
-                <p className="absolute right-1/2 translate-x-1/2 bottom-4 z-30">
+                <p className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-black p-4">
                     {guidance !== "none"
                         ? GUIDANCE_TEXT[guidance]
                         : PHASE_TEXT[phase]}
                 </p>
+
+                <div className="absolute z-30 right-0 bottom-1/2 translate-y-1/2">
+                    {images.length ? (
+                        images.map((_, key) => (
+                            <p className="bg-black p-6" key={key}>
+                                Image teken
+                            </p>
+                        ))
+                    ) : (
+                        <p className="bg-black p-6">No image</p>
+                    )}
+                </div>
                 <motion.div
-                    initial={{ opacity: 1 }}
-                    animate={{ opacity: isCvLoaded ? 0 : 1 }}
+                    initial={{ opacity: 1, backdropFilter: "blur(10px)" }}
+                    animate={{
+                        opacity: isCvLoaded ? 0 : 1,
+                        backdropFilter: isCvLoaded ? "blur(0px)" : "blur(10px)",
+                        // This ensures it doesn't block clicks after fading out
+                        pointerEvents: isCvLoaded ? "none" : "auto",
+                    }}
                     transition={{ duration: 1, delay: 0.5 }}
-                    className="bg-black w-full h-full absolute inset-0 z-20"
+                    className="bg-black/40 w-full h-full absolute inset-0 z-20"
                 />
                 <div className="flex h-screen justify-center items-center relative">
                     <video
@@ -347,7 +378,18 @@ const Camera = () => {
             <Script
                 src="/opencv.js"
                 strategy="lazyOnload"
-                onLoad={() => setCvLoaded(true)}
+                onLoad={() => {
+                    const cv = (window as any).cv;
+                    if (cv && cv.Mat) {
+                        // Already initialized
+                        setCvLoaded(true);
+                    } else if (cv) {
+                        // WASM still compiling — wait for runtime
+                        cv["onRuntimeInitialized"] = () => {
+                            setCvLoaded(true);
+                        };
+                    }
+                }}
             />
         </>
     );
