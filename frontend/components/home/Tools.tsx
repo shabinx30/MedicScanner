@@ -24,7 +24,7 @@ const Tools = () => {
                 </div>
             </div>
             <div className="relative my-6">
-                <p className="absolute text-sm right-1/2 bottom-1/2 translate-x-1/2 translate-y-1/2 bg-background px-1">
+                <p className="absolute text-xs right-1/2 bottom-1/2 translate-x-1/2 translate-y-1/2 bg-background px-1">
                     OR
                 </p>
                 <hr className="h-px border-0 bg-linear-to-r from-transparent via-gray-300 dark:via-[#4b4b4b] to-transparent" />

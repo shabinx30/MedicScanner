@@ -7,20 +7,8 @@ import { IoArrowBackOutline } from "react-icons/io5";
 import { motion } from "framer-motion";
 import { useAppContext } from "@/context/AppContext";
 import useFullScreen from "@/libs/FullScreen";
-
-type ScanPhase =
-    | "detecting"
-    | "front_captured"
-    | "waiting_flip"
-    | "back_captured"
-    | "done";
-type Guidance =
-    | "none"
-    | "move_closer"
-    | "hold_steady"
-    | "no_object"
-    | "dark"
-    | "glare";
+import { Guidance, ScanPhase } from "@/types/types.camera";
+import { GUIDANCE_TEXT, PHASE_TEXT } from "@/const/camera";
 
 const Camera = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -159,40 +147,7 @@ const Camera = () => {
             return { pass: false, reason: "hold_steady" as Guidance };
         }
 
-        // Object in frame + size check
-        // const blurred = new cv.Mat();
-        // cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
-        // const edges = new cv.Mat();
-        // cv.Canny(blurred, edges, 50, 150);
-
-        // const contours = new cv.MatVector();
-        // const hierarchy = new cv.Mat();
-        // cv.findContours(
-        //     edges,
-        //     contours,
-        //     hierarchy,
-        //     cv.RETR_EXTERNAL,
-        //     cv.CHAIN_APPROX_SIMPLE,
-        // );
-
-        // let maxArea = 0;
-        // for (let i = 0; i < contours.size(); i++) {
-        //     const area = cv.contourArea(contours.get(i));
-        //     if (area > maxArea) {
-        //         maxArea = area;
-        //     }
-        // }
-
-        // contours.delete();
-        // hierarchy.delete();
-        // blurred.delete();
-        // edges.delete();
         gray.delete();
-
-        // if (maxArea < frameArea * 0.08)
-        //     return { pass: false, reason: "no_object" as Guidance };
-        // if (maxArea < frameArea * 0.25)
-        //     return { pass: false, reason: "move_closer" as Guidance };
 
         // return { pass: true, reason: "none" as Guidance };
         return { pass: false, reason: "none" as Guidance };
@@ -299,23 +254,6 @@ const Camera = () => {
         }
     }, [phase, images]);
 
-    const GUIDANCE_TEXT: Record<Guidance, string> = {
-        none: "",
-        no_object: "Point the camera at the medicine",
-        move_closer: "Move closer to the medicine",
-        hold_steady: "Hold steady...",
-        glare: "Too much glare — tilt slightly",
-        dark: "Too dark — find better lighting",
-    };
-
-    const PHASE_TEXT: Record<ScanPhase, string> = {
-        detecting: "Scanning front...",
-        front_captured: "Front captured ✓",
-        waiting_flip: "Now flip the medicine to show the back",
-        back_captured: "Back captured ✓",
-        done: "Done! Extracting details...",
-    };
-
     return (
         <>
             <div
@@ -365,6 +303,9 @@ const Camera = () => {
                     transition={{ duration: 1, delay: 0.5 }}
                     className="bg-black/40 w-full h-full absolute inset-0 z-20"
                 />
+                <div
+                    className={`absolute w-full h-full z-23 transition-colors ${guidance === "glare" ? "bg-red-500/25" : guidance === "hold_steady" ? "bg-blue-500/25" : "bg-transparent"}`}
+                ></div>
                 <div className="flex h-screen justify-center items-center relative">
                     <video
                         ref={videoRef}
@@ -387,7 +328,9 @@ const Camera = () => {
                         setCvLoaded(true);
                     } else if (cv) {
                         // WASM still compiling — wait for runtime
-                        cv["onRuntimeInitialized"] = () => {
+                        cv["onRuntimeInitialized"] = async () => {
+                            //loading EAST model
+
                             setCvLoaded(true);
                         };
                     }
