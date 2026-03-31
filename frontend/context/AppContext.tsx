@@ -10,21 +10,21 @@ import {
 } from "react";
 
 interface IContext {
-    isCvLoaded: boolean;
-    setCvLoaded: Dispatch<SetStateAction<boolean>>;
+    isEngineLoaded: boolean;
+    setEnginLoaded: Dispatch<SetStateAction<boolean>>;
 }
 
 export const AppContext = createContext<IContext | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-    const [isCvLoaded, setCvLoaded] = useState(false);
+    const [isEngineLoaded, setEnginLoaded] = useState(false);
 
     const value = useMemo(
         () => ({
-            isCvLoaded,
-            setCvLoaded,
+            isEngineLoaded,
+            setEnginLoaded,
         }),
-        [isCvLoaded],
+        [isEngineLoaded],
     );
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
