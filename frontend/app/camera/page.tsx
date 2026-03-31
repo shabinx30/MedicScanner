@@ -14,11 +14,11 @@ const Camera = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
     const cameraPage = useRef<HTMLDivElement>(null);
-    const { isCvLoaded, setCvLoaded } = useAppContext();
+    const { isEngineLoaded, setEnginLoaded } = useAppContext();
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const prevFrameRef = useRef<any>(null);
     const frontFrameRef = useRef<string | null>(null);
     const loopRef = useRef<number>(0);
+    const ocrRef = useRef<any>(null);
 
     const [phase, setPhase] = useState<ScanPhase>("detecting");
     const [guidance, setGuidance] = useState<Guidance>("no_object");
@@ -71,7 +71,7 @@ const Camera = () => {
 
     useEffect(() => {
         stopLoop();
-        if (!isCvLoaded) return;
+        if (!isEngineLoaded) return;
         const video = videoRef.current;
         const canvas = canvasRef.current;
         if (!video || !canvas) return;
@@ -100,7 +100,7 @@ const Camera = () => {
         };
 
         tryStart();
-    }, [phase, isCvLoaded]);
+    }, [phase, isEngineLoaded]);
 
     const runChecks = (cv: any, src: any) => {
         const frameArea = src.rows * src.cols;
@@ -266,7 +266,7 @@ const Camera = () => {
                 >
                     <IoArrowBackOutline className="text-[#41f5ff]" size={30} />
                 </Link>
-                {!isCvLoaded && (
+                {!isEngineLoaded && (
                     <h3 className="absolute z-30 bottom-1/2 right-1/2 translate-y-1/2 translate-x-1/2">
                         Loading Camera Engine...
                     </h3>
@@ -295,16 +295,18 @@ const Camera = () => {
                 <motion.div
                     initial={{ opacity: 1, backdropFilter: "blur(10px)" }}
                     animate={{
-                        opacity: isCvLoaded ? 0 : 1,
-                        backdropFilter: isCvLoaded ? "blur(0px)" : "blur(10px)",
+                        opacity: isEngineLoaded ? 0 : 1,
+                        backdropFilter: isEngineLoaded
+                            ? "blur(0px)"
+                            : "blur(10px)",
                         // This ensures it doesn't block clicks after fading out
-                        pointerEvents: isCvLoaded ? "none" : "auto",
+                        pointerEvents: isEngineLoaded ? "none" : "auto",
                     }}
                     transition={{ duration: 1, delay: 0.5 }}
                     className="bg-black/40 w-full h-full absolute inset-0 z-20"
                 />
                 <div
-                    className={`absolute w-full h-full z-23 transition-colors ${guidance === "glare" ? "bg-red-500/25" : guidance === "hold_steady" ? "bg-blue-500/25" : "bg-transparent"}`}
+                    className={`absolute w-full h-full z-23 transition-colors duration-300 ${guidance === "glare" ? "bg-red-500/25" : guidance === "hold_steady" ? "bg-blue-500/25" : "bg-transparent"}`}
                 ></div>
                 <div className="flex h-screen justify-center items-center relative">
                     <video
@@ -322,16 +324,29 @@ const Camera = () => {
                 src="/opencv.js"
                 strategy="lazyOnload"
                 onLoad={() => {
+
                     const cv = (window as any).cv;
                     if (cv && cv.Mat) {
                         // Already initialized
-                        setCvLoaded(true);
+                        setEnginLoaded(true);
                     } else if (cv) {
                         // WASM still compiling — wait for runtime
                         cv["onRuntimeInitialized"] = async () => {
-                            //loading EAST model
+                            const Ocr = (await import("@gutenye/ocr-browser"))
+                                .default;
+                            
+                            ocrRef.current = await Ocr.create({
+                                models: {
+                                    detectionPath:
+                                        "/model/ch_PP-OCRv4_det_infer.onnx",
+                                    recognitionPath:
+                                        "/model/ch_PP-OCRv4_rec_infer.onnx",
+                                    dictionaryPath:
+                                        "/model/ppocr_keys_v1.txt",
+                                },
+                            });
 
-                            setCvLoaded(true);
+                            setEnginLoaded(true);
                         };
                     }
                 }}

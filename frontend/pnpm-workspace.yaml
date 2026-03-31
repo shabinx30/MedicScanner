@@ -1,3 +1,6 @@
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+
+patchedDependencies:
+  js-clipper@1.0.1: patches/js-clipper@1.0.1.patch
