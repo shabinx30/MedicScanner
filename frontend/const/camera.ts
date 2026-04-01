@@ -1,4 +1,4 @@
-import { Guidance, ScanPhase } from "@/types/types.camera";
+import { Guidance, ScanPhase } from "@/types/camera.type";
 
 export const GUIDANCE_TEXT: Record<Guidance, string> = {
     none: "",

@@ -7,8 +7,14 @@ import { IoArrowBackOutline } from "react-icons/io5";
 import { motion } from "framer-motion";
 import { useAppContext } from "@/context/AppContext";
 import useFullScreen from "@/libs/FullScreen";
-import { Guidance, ScanPhase } from "@/types/types.camera";
+import { Guidance, ScanPhase } from "@/types/camera.type";
 import { GUIDANCE_TEXT, PHASE_TEXT } from "@/const/camera";
+import React from "react";
+
+interface ITexts {
+    text: string;
+}
+[];
 
 const Camera = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -18,11 +24,12 @@ const Camera = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const frontFrameRef = useRef<string | null>(null);
     const loopRef = useRef<number>(0);
-    const ocrRef = useRef<any>(null);
+    const textRecWorkerRef = useRef<Worker | null>(null);
 
     const [phase, setPhase] = useState<ScanPhase>("detecting");
     const [guidance, setGuidance] = useState<Guidance>("no_object");
     const [images, setImages] = useState<string[]>([]);
+    const [exText, setExText] = useState<any>([]);
 
     // fullscreen related
     const { tryFullscreen } = useFullScreen(cameraPage);
@@ -55,6 +62,10 @@ const Camera = () => {
             }
         })();
 
+        textRecWorkerRef.current = new Worker(
+            new URL("@/workers/text_rec.worker.ts", import.meta.url),
+        );
+
         return () => {
             if (streamRef.current) {
                 streamRef.current.getTracks().forEach((track) => track.stop());
@@ -62,6 +73,9 @@ const Camera = () => {
             }
 
             stopLoop();
+            if (textRecWorkerRef.current) {
+                textRecWorkerRef.current.terminate();
+            }
             // Exit fullscreen on unmount
             // if (isFullscreen()) {
             //     exitFullscreen().catch(() => {});
@@ -102,7 +116,7 @@ const Camera = () => {
         tryStart();
     }, [phase, isEngineLoaded]);
 
-    const runChecks = (cv: any, src: any) => {
+    const runChecks = async (cv: any, src: any) => {
         const frameArea = src.rows * src.cols;
         const gray = new cv.Mat();
         cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
@@ -147,10 +161,49 @@ const Camera = () => {
             return { pass: false, reason: "hold_steady" as Guidance };
         }
 
+        const texts = await handleTextDetection();
+
         gray.delete();
 
-        // return { pass: true, reason: "none" as Guidance };
-        return { pass: false, reason: "none" as Guidance };
+        if (texts && texts.length >= 2) {
+            setExText((p: any) => {
+                return [...p, texts];
+            });
+            return { pass: true, reason: "none" as Guidance };
+        }
+
+        return { pass: false, reason: "move_closer" as Guidance };
+    };
+
+    const handleTextDetection = async (): Promise<any[]> => {
+        if (!isEngineLoaded || !canvasRef.current || !textRecWorkerRef.current)
+            return [];
+
+        return new Promise((resolve) => {
+            try {
+                const imageDataUrl = canvasRef.current!.toDataURL(
+                    "image/jpeg",
+                    0.8,
+                );
+
+                const handleMessage = (e: MessageEvent) => {
+                    textRecWorkerRef.current!.removeEventListener(
+                        "message",
+                        handleMessage,
+                    );
+                    resolve(e.data || []);
+                };
+
+                textRecWorkerRef.current!.addEventListener(
+                    "message",
+                    handleMessage,
+                );
+                textRecWorkerRef.current!.postMessage(imageDataUrl);
+            } catch (error) {
+                console.log("failed to trigger worker text detection", error);
+                resolve([]);
+            }
+        });
     };
 
     const startDetectionLoop = (mode: "front" | "flip") => {
@@ -161,39 +214,60 @@ const Camera = () => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
 
-        const loop = () => {
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const src = cv.imread(canvas);
+        const fps = 10;
+        const fpsInterval = 1000 / fps;
+        let then = window.performance.now();
+        let isProcessing = false;
 
-            if (mode === "front") {
-                const { pass, reason } = runChecks(cv, src);
-                setGuidance(reason);
-
-                if (pass) {
-                    captureImage(canvas, "front");
-                    setPhase("front_captured");
-                    src.delete();
-                    return;
-                }
+        const loop = async (timestamp: DOMHighResTimeStamp) => {
+            if (isProcessing) {
+                loopRef.current = requestAnimationFrame(loop);
+                return;
             }
 
-            if (mode === "flip") {
-                if (frontFrameRef.current) {
-                    const flipped = detectFlip(cv, src, canvas);
-                    if (flipped) {
-                        const { pass, reason } = runChecks(cv, src);
-                        setGuidance(reason);
-                        if (pass) {
-                            captureImage(canvas, "back");
-                            setPhase("done");
-                            src.delete();
-                            return;
+            const elapsed = timestamp - then;
+
+            if (elapsed > fpsInterval) {
+                then = timestamp - (elapsed % fpsInterval);
+
+                isProcessing = true;
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const src = cv.imread(canvas);
+
+                if (mode === "front") {
+                    const { pass, reason } = await runChecks(cv, src);
+                    setGuidance(reason);
+
+                    if (pass) {
+                        captureImage(canvas, "front");
+                        setPhase("front_captured");
+                        setTimeout(() => setPhase("waiting_flip"), 1500);
+                        src.delete();
+                        return;
+                    }
+                }
+
+                if (mode === "flip") {
+                    if (frontFrameRef.current) {
+                        const flipped = detectFlip(cv, src, canvas);
+                        if (flipped) {
+                            const { pass, reason } = await runChecks(cv, src);
+                            setGuidance(reason);
+                            if (pass) {
+                                captureImage(canvas, "back");
+                                setPhase("back_captured");
+                                setTimeout(() => setPhase("done"), 1500);
+                                src.delete();
+                                return;
+                            }
                         }
                     }
                 }
+
+                src.delete();
+                isProcessing = false;
             }
 
-            src.delete();
             loopRef.current = requestAnimationFrame(loop);
         };
 
@@ -262,9 +336,12 @@ const Camera = () => {
             >
                 <Link
                     href="/"
-                    className="absolute top-7.5 left-7.5 z-40 bg-[#2b2b2b] py-2 px-3 rounded-2xl"
+                    className="absolute top-7.5 left-7.5 z-40 bg-gray-200 dark:bg-[#2b2b2b] py-2 px-3 rounded-2xl"
                 >
-                    <IoArrowBackOutline className="text-[#41f5ff]" size={30} />
+                    <IoArrowBackOutline
+                        className="text-black dark:text-[#41f5ff]"
+                        size={30}
+                    />
                 </Link>
                 {!isEngineLoaded && (
                     <h3 className="absolute z-30 bottom-1/2 right-1/2 translate-y-1/2 translate-x-1/2">
@@ -274,7 +351,7 @@ const Camera = () => {
                 <motion.p
                     layout
                     transition={{ duration: 0.1, ease: "easeIn" }}
-                    className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-black p-4"
+                    className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-white dark:bg-black p-4"
                 >
                     {guidance !== "none"
                         ? GUIDANCE_TEXT[guidance]
@@ -284,12 +361,21 @@ const Camera = () => {
                 <div className="absolute z-30 right-0 bottom-1/2 translate-y-1/2">
                     {images.length ? (
                         images.map((_, key) => (
-                            <p className="bg-black p-6" key={key}>
+                            <p className="bg-white dark:bg-black p-6" key={key}>
                                 Image teken
+                                <br />
+                                {exText[key].map(
+                                    (te: { text: string }, i: number) => (
+                                        <React.Fragment key={i}>
+                                            <span>{te.text}</span>
+                                            <br />
+                                        </React.Fragment>
+                                    ),
+                                )}
                             </p>
                         ))
                     ) : (
-                        <p className="bg-black p-6">No image</p>
+                        <p className="bg-white dark:bg-black p-6">No image</p>
                     )}
                 </div>
                 <motion.div
@@ -324,7 +410,6 @@ const Camera = () => {
                 src="/opencv.js"
                 strategy="lazyOnload"
                 onLoad={() => {
-
                     const cv = (window as any).cv;
                     if (cv && cv.Mat) {
                         // Already initialized
@@ -332,20 +417,6 @@ const Camera = () => {
                     } else if (cv) {
                         // WASM still compiling — wait for runtime
                         cv["onRuntimeInitialized"] = async () => {
-                            const Ocr = (await import("@gutenye/ocr-browser"))
-                                .default;
-                            
-                            ocrRef.current = await Ocr.create({
-                                models: {
-                                    detectionPath:
-                                        "/model/ch_PP-OCRv4_det_infer.onnx",
-                                    recognitionPath:
-                                        "/model/ch_PP-OCRv4_rec_infer.onnx",
-                                    dictionaryPath:
-                                        "/model/ppocr_keys_v1.txt",
-                                },
-                            });
-
                             setEnginLoaded(true);
                         };
                     }
