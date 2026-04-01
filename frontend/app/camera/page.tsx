@@ -165,7 +165,7 @@ const Camera = () => {
 
         gray.delete();
 
-        if (texts && texts.length >= 2) {
+        if (texts.length && texts[0].text.length >= 4) {
             setExText((p: any) => {
                 return [...p, texts];
             });
@@ -181,7 +181,15 @@ const Camera = () => {
 
         return new Promise((resolve) => {
             try {
-                const imageDataUrl = canvasRef.current!.toDataURL(
+                const tempCanvas = document.createElement("canvas");
+                tempCanvas.width = 640;
+                tempCanvas.height = 640;
+                const tempCtx = tempCanvas.getContext("2d");
+                if (tempCtx && canvasRef.current) {
+                    tempCtx.drawImage(canvasRef.current, 0, 0, 640, 640);
+                }
+
+                const imageDataUrl = tempCanvas.toDataURL(
                     "image/jpeg",
                     0.8,
                 );
