@@ -1,6 +1,6 @@
-// text_rec.worker.ts
+import type OCR from "@gutenye/ocr-browser"
 
-// 1. Polyfill document and Image for @gutenye/ocr-browser to run cleanly in Web Worker
+// Polyfill document and Image for @gutenye/ocr-browser to run cleanly in Web Worker
 if (typeof (self as any).document === "undefined") {
     (self as any).document = {
         createElement: (tag: string) => {
@@ -67,12 +67,12 @@ async function getOcr() {
 self.onmessage = async (e) => {
     const imageDataUrl = e.data;
     try {
-        const ocr = await getOcr();
+        const ocr = await getOcr() as OCR;
         console.log("ocr is ready");
 
         console.log("Starting Web Worker OCR detection...");
-        const result = await ocr.detect(imageDataUrl); 
-        console.log("Worker Detection finished.");
+        const result = await ocr.detect(imageDataUrl);
+        console.log("Worker Detection finished.", result);
         self.postMessage(result);
     } catch (error) {
         console.log("ocr fail", error);
