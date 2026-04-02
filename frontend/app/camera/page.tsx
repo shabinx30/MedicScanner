@@ -11,11 +11,6 @@ import { Guidance, ScanPhase } from "@/types/camera.type";
 import { GUIDANCE_TEXT, PHASE_TEXT } from "@/const/camera";
 import React from "react";
 
-interface ITexts {
-    text: string;
-}
-[];
-
 const Camera = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
@@ -165,7 +160,10 @@ const Camera = () => {
 
         gray.delete();
 
-        if (texts.length && texts[0].text.length >= 4) {
+        if (
+            texts.length >= 2 &&
+            (texts[0].text.length > 4 || texts[1].text.length > 4)
+        ) {
             setExText((p: any) => {
                 return [...p, texts];
             });
@@ -189,10 +187,7 @@ const Camera = () => {
                     tempCtx.drawImage(canvasRef.current, 0, 0, 640, 640);
                 }
 
-                const imageDataUrl = tempCanvas.toDataURL(
-                    "image/jpeg",
-                    0.8,
-                );
+                const imageDataUrl = tempCanvas.toDataURL("image/jpeg", 0.8);
 
                 const handleMessage = (e: MessageEvent) => {
                     textRecWorkerRef.current!.removeEventListener(
