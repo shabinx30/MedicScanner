@@ -68,11 +68,8 @@ self.onmessage = async (e) => {
     const imageDataUrl = e.data;
     try {
         const ocr = await getOcr() as OCR;
-        console.log("ocr is ready");
 
-        console.log("Starting Web Worker OCR detection...");
         const result = await ocr.detect(imageDataUrl);
-        console.log("Worker Detection finished.", result);
         self.postMessage(result);
     } catch (error) {
         console.log("ocr fail", error);
