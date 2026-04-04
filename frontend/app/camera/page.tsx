@@ -25,6 +25,7 @@ const Camera = () => {
     const [guidance, setGuidance] = useState<Guidance>("no_object");
     const [images, setImages] = useState<string[]>([]);
     const [exText, setExText] = useState<any>([]);
+    const torchRef = useRef<boolean>(false);
 
     // fullscreen related
     const { tryFullscreen } = useFullScreen(cameraPage);
@@ -111,6 +112,40 @@ const Camera = () => {
         tryStart();
     }, [phase, isEngineLoaded]);
 
+    const toggleTorch = async (status: boolean) => {
+        const tracks = streamRef.current?.getVideoTracks();
+
+        if (!tracks || tracks.length === 0) {
+            console.log("no video tracks found!");
+            return;
+        }
+
+        const track = tracks[0];
+
+        if (!track.getCapabilities) {
+            console.log("browser doesn't support getCapabilities");
+            return;
+        }
+
+        const capabilities = track.getCapabilities();
+
+        if (
+            "fillLightMode" in capabilities &&
+            Array.isArray(capabilities?.fillLightMode) &&
+            capabilities?.fillLightMode?.includes("flash")
+        ) {
+            try {
+                await track.applyConstraints({
+                    advanced: [{ torch: status }] as any,
+                });
+            } catch (error) {
+                console.log("could not toggle torch");
+            }
+        } else {
+            console.log("torch is not suppoted");
+        }
+    };
+
     const runChecks = async (cv: any, src: any) => {
         const frameArea = src.rows * src.cols;
         const gray = new cv.Mat();
@@ -120,8 +155,10 @@ const Camera = () => {
         const brightness = cv.mean(gray)[0];
         if (brightness < 50) {
             gray.delete();
+            toggleTorch(true);
             return { pass: false, reason: "dark" as Guidance };
         }
+        toggleTorch(false);
 
         // Glare check
         const thresh = new cv.Mat();
