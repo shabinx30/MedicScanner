@@ -8,9 +8,8 @@ const Header = () => {
                 <GiMedicines className="text-[#41f5ff]" size={45} />
                 Medic Scanner
             </h1>
-            <h6 className="w-[75%] text-center text-sm md:text-base text-[#9b9b9b] md:leading-normal tracking-wide">
-                This Application helps you to find whether your medicine have
-                enough quality to take or not.
+            <h6 className="w-[75%] text-center text-sm md:text-base text-[#9b9b9b] leading-tight tracking-wide">
+                Check if your medicine is safe and reliable before you take it.
             </h6>
         </header>
     );
