@@ -173,7 +173,7 @@ const Camera = () => {
             return { pass: true, reason: "none" as Guidance };
         }
 
-        return { pass: false, reason: "move_closer" as Guidance };
+        return { pass: false, reason: "no_object" as Guidance };
     };
 
     const handleTextDetection = async (): Promise<any[]> => {
@@ -293,7 +293,7 @@ const Camera = () => {
         if (!frontFrameRef.current) return false;
 
         // Load saved front image into a Mat
-        const img = new Image();
+        const img = new window.Image();
         img.src = frontFrameRef.current;
         const offscreen = document.createElement("canvas");
         offscreen.width = canvas.width;
@@ -320,14 +320,14 @@ const Camera = () => {
         diff.delete();
 
         const changeRatio = changedPixels / totalPixels;
-        return changeRatio > 0.45; // 45% of pixels changed = flipped
+        return changeRatio > 0.9; // 90% of pixels changed = flipped
     };
 
     const captureImage = (
         canvas: HTMLCanvasElement,
         side: "front" | "back",
     ) => {
-        const dataUrl = canvas.toDataURL("image/jpeg");
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
         if (side === "front") frontFrameRef.current = dataUrl;
         setImages((prev) => [...prev, dataUrl]);
     };
@@ -335,7 +335,7 @@ const Camera = () => {
     // When phase === 'done', send both to NestJS
     useEffect(() => {
         if (phase === "done" && images.length >= 2) {
-            console.log(images);
+            // console.log(images);
         }
     }, [phase, images]);
 
@@ -347,11 +347,10 @@ const Camera = () => {
             >
                 <Link
                     href="/"
-                    className="absolute top-7.5 left-7.5 z-40 bg-gray-200 dark:bg-[#2b2b2b] py-2 px-3 rounded-2xl"
+                    className="absolute top-2.5 md:top-7.5 left-2.5 md:left-7.5 z-40 bg-white dark:bg-[#1b1b1b] py-2.5 px-3.5 rounded-2xl"
                 >
                     <IoArrowBackOutline
-                        className="text-black dark:text-[#41f5ff]"
-                        size={30}
+                        size={25}
                     />
                 </Link>
                 {!isEngineLoaded && (
@@ -361,8 +360,8 @@ const Camera = () => {
                 )}
                 {readyBtn ? (
                     !isUserReady ? (
-                        <div className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-white py-4 px-10 rounded-2xl flex flex-col items-center gap-3">
-                            <p className="text-center text-sm">
+                        <div className="absolute right-1/2 translate-x-1/2 text-sm bottom-4 z-30 bg-white dark:bg-[#1b1b1b] py-5 px-7.5 md:px-10 rounded-3xl flex flex-col items-center gap-3">
+                            <p className="text-center">
                                 Ready to take the back side?
                             </p>
                             <button
@@ -370,7 +369,7 @@ const Camera = () => {
                                     setUserReady(true);
                                     startDetectionLoop("flip");
                                 }}
-                                className="bg-black text-[#41f5ff] rounded-2xl px-4 py-1.5 cursor-pointer"
+                                className="bg-[#1b1b1b] text-[#41f5ff] dark:bg-[#41f5ff] dark:text-black rounded-2xl px-4 py-1.5 cursor-pointer"
                             >
                                 Ready
                             </button>
@@ -379,7 +378,7 @@ const Camera = () => {
                         <motion.p
                             layout
                             transition={{ duration: 0.1, ease: "easeIn" }}
-                            className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-white dark:bg-black p-4"
+                            className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-white dark:bg-black text-sm rounded-2xl py-4 px-6"
                         >
                             {guidance !== "none"
                                 ? GUIDANCE_TEXT[guidance]
@@ -387,38 +386,16 @@ const Camera = () => {
                         </motion.p>
                     )
                 ) : (
-                    <motion.p
+                    <motion.div
                         layout
                         transition={{ duration: 0.1, ease: "easeIn" }}
-                        className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-white dark:bg-black p-4"
+                        className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-white dark:bg-black text-sm rounded-2xl py-4 px-6"
                     >
                         {guidance !== "none"
                             ? GUIDANCE_TEXT[guidance]
                             : PHASE_TEXT[phase]}
-                    </motion.p>
+                    </motion.div>
                 )}
-
-                <div className="absolute z-30 right-0 bottom-1/2 translate-y-1/2">
-                    {images.length ? (
-                        images.map((_, key) => (
-                            <p className="bg-white dark:bg-black p-6" key={key}>
-                                Image taken
-                                <br />
-                                {exText[key].map(
-                                    (te: { text: string }, i: number) => (
-                                        <React.Fragment key={i}>
-                                            <span>{te.text}</span>
-                                            <br />
-                                        </React.Fragment>
-                                    ),
-                                )}
-                                <img className="w-[5em]" src={images[key]} alt={String(key)} width={100} height={100} />
-                            </p>
-                        ))
-                    ) : (
-                        <p className="bg-white dark:bg-black p-6">No image</p>
-                    )}
-                </div>
                 <motion.div
                     initial={{ opacity: 1, backdropFilter: "blur(10px)" }}
                     animate={{
@@ -442,7 +419,7 @@ const Camera = () => {
                         playsInline
                         muted
                         // style={{ transform: "scaleX(-1)" }}
-                        className="w-screen h-screen rounded-4xl object-cover object-center"
+                        className="w-screen h-screen md:rounded-4xl object-cover object-center"
                     ></video>
                     <canvas ref={canvasRef} className="hidden"></canvas>
                 </div>

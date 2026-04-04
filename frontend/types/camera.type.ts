@@ -4,6 +4,8 @@ export type ScanPhase =
     | "waiting_flip"
     | "back_captured"
     | "done";
+
+
 export type Guidance =
     | "none"
     | "move_closer"
