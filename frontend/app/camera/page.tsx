@@ -138,6 +138,8 @@ const Camera = () => {
                 await track.applyConstraints({
                     advanced: [{ torch: status }] as any,
                 });
+
+                torchRef.current = status;
             } catch (error) {
                 console.log("could not toggle torch");
             }
@@ -155,10 +157,14 @@ const Camera = () => {
         const brightness = cv.mean(gray)[0];
         if (brightness < 50) {
             gray.delete();
-            toggleTorch(true);
+            if (!torchRef.current) {
+                await toggleTorch(true);
+            }
             return { pass: false, reason: "dark" as Guidance };
         }
-        toggleTorch(false);
+        if (torchRef.current) {
+            await toggleTorch(false);
+        }
 
         // Glare check
         const thresh = new cv.Mat();
