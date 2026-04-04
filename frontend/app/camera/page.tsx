@@ -25,7 +25,7 @@ const Camera = () => {
     const [guidance, setGuidance] = useState<Guidance>("no_object");
     const [images, setImages] = useState<string[]>([]);
     const [exText, setExText] = useState<any>([]);
-    const torchRef = useRef<boolean>(false);
+    const torchRef = useRef<boolean | "no_torch">(false);
 
     // fullscreen related
     const { tryFullscreen } = useFullScreen(cameraPage);
@@ -124,16 +124,13 @@ const Camera = () => {
 
         if (!track.getCapabilities) {
             console.log("browser doesn't support getCapabilities");
+            torchRef.current = "no_torch"
             return;
         }
 
-        const capabilities = track.getCapabilities();
+        const capabilities = track.getCapabilities() as any;
 
-        if (
-            "fillLightMode" in capabilities &&
-            Array.isArray(capabilities?.fillLightMode) &&
-            capabilities?.fillLightMode?.includes("flash")
-        ) {
+        if ("torch" in capabilities && capabilities.torch) {
             try {
                 await track.applyConstraints({
                     advanced: [{ torch: status }] as any,
@@ -142,9 +139,11 @@ const Camera = () => {
                 torchRef.current = status;
             } catch (error) {
                 console.log("could not toggle torch");
+                torchRef.current = "no_torch"
             }
         } else {
             console.log("torch is not suppoted");
+            torchRef.current = "no_torch"
         }
     };
 
@@ -157,12 +156,12 @@ const Camera = () => {
         const brightness = cv.mean(gray)[0];
         if (brightness < 50) {
             gray.delete();
-            if (!torchRef.current) {
+            if (!torchRef.current || torchRef.current !== "no_torch") {
                 await toggleTorch(true);
             }
             return { pass: false, reason: "dark" as Guidance };
         }
-        if (torchRef.current) {
+        if (torchRef.current === true || torchRef.current !== "no_torch" ) {
             await toggleTorch(false);
         }
 
