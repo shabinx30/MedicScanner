@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { FaCamera } from "react-icons/fa";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { SlArrowRight } from "react-icons/sl";
 import { TbRosetteDiscountCheck } from "react-icons/tb";
+import { LuScanText } from "react-icons/lu";
 
 const Tools = () => {
     return (
@@ -13,8 +13,8 @@ const Tools = () => {
                     className="bg-[#41f5ff] hover:bg-[#41f5ff]/75 duration-300 font-semibold flex justify-between gap-[6em] md:gap-[10em] items-center w-full cursor-pointer text-black px-5 py-6 rounded-2xl"
                 >
                     <div className="flex gap-3">
-                        <FaCamera size={22} />
-                        Open Camera
+                        <LuScanText size={22} />
+                        Open Scanner
                     </div>
                     <SlArrowRight />
                 </Link>
