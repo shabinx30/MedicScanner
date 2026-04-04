@@ -25,7 +25,9 @@ const Camera = () => {
     const [guidance, setGuidance] = useState<Guidance>("no_object");
     const [images, setImages] = useState<string[]>([]);
     const [exText, setExText] = useState<any>([]);
-    const torchRef = useRef<boolean | "no_torch">(false);
+    const [isFlipped, setFlipped] = useState(false);
+    const [readyBtn, setReadyBtn] = useState(false);
+    const [isUserReady, setUserReady] = useState(false);
 
     // fullscreen related
     const { tryFullscreen } = useFullScreen(cameraPage);
@@ -112,41 +114,6 @@ const Camera = () => {
         tryStart();
     }, [phase, isEngineLoaded]);
 
-    const toggleTorch = async (status: boolean) => {
-        const tracks = streamRef.current?.getVideoTracks();
-
-        if (!tracks || tracks.length === 0) {
-            console.log("no video tracks found!");
-            return;
-        }
-
-        const track = tracks[0];
-
-        if (!track.getCapabilities) {
-            console.log("browser doesn't support getCapabilities");
-            torchRef.current = "no_torch"
-            return;
-        }
-
-        const capabilities = track.getCapabilities() as any;
-
-        if ("torch" in capabilities && capabilities.torch) {
-            try {
-                await track.applyConstraints({
-                    advanced: [{ torch: status }] as any,
-                });
-
-                torchRef.current = status;
-            } catch (error) {
-                console.log("could not toggle torch");
-                torchRef.current = "no_torch"
-            }
-        } else {
-            console.log("torch is not suppoted");
-            torchRef.current = "no_torch"
-        }
-    };
-
     const runChecks = async (cv: any, src: any) => {
         const frameArea = src.rows * src.cols;
         const gray = new cv.Mat();
@@ -156,13 +123,7 @@ const Camera = () => {
         const brightness = cv.mean(gray)[0];
         if (brightness < 50) {
             gray.delete();
-            if (!torchRef.current || torchRef.current !== "no_torch") {
-                await toggleTorch(true);
-            }
             return { pass: false, reason: "dark" as Guidance };
-        }
-        if (torchRef.current === true || torchRef.current !== "no_torch" ) {
-            await toggleTorch(false);
         }
 
         // Glare check
@@ -294,17 +255,22 @@ const Camera = () => {
 
                 if (mode === "flip") {
                     if (frontFrameRef.current) {
-                        const flipped = detectFlip(cv, src, canvas);
-                        if (flipped) {
-                            const { pass, reason } = await runChecks(cv, src);
-                            setGuidance(reason);
-                            if (pass) {
-                                captureImage(canvas, "back");
-                                setPhase("back_captured");
-                                setTimeout(() => setPhase("done"), 1500);
-                                src.delete();
+                        if (!isFlipped) {
+                            const flipped = detectFlip(cv, src, canvas);
+                            if (flipped) {
+                                setFlipped(true);
+                                setReadyBtn(true);
                                 return;
                             }
+                        }
+                        const { pass, reason } = await runChecks(cv, src);
+                        setGuidance(reason);
+                        if (pass) {
+                            captureImage(canvas, "back");
+                            setPhase("back_captured");
+                            setTimeout(() => setPhase("done"), 1500);
+                            src.delete();
+                            return;
                         }
                     }
                 }
@@ -361,7 +327,7 @@ const Camera = () => {
         canvas: HTMLCanvasElement,
         side: "front" | "back",
     ) => {
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+        const dataUrl = canvas.toDataURL("image/jpeg");
         if (side === "front") frontFrameRef.current = dataUrl;
         setImages((prev) => [...prev, dataUrl]);
     };
@@ -393,21 +359,50 @@ const Camera = () => {
                         Loading Camera Engine...
                     </h3>
                 )}
-                <motion.p
-                    layout
-                    transition={{ duration: 0.1, ease: "easeIn" }}
-                    className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-white dark:bg-black p-4"
-                >
-                    {guidance !== "none"
-                        ? GUIDANCE_TEXT[guidance]
-                        : PHASE_TEXT[phase]}
-                </motion.p>
+                {readyBtn ? (
+                    !isUserReady ? (
+                        <div className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-white py-4 px-10 rounded-2xl flex flex-col items-center gap-3">
+                            <p className="text-center text-sm">
+                                Ready to take the back side?
+                            </p>
+                            <button
+                                onClick={() => {
+                                    setUserReady(true);
+                                    startDetectionLoop("flip");
+                                }}
+                                className="bg-black text-[#41f5ff] rounded-2xl px-4 py-1.5 cursor-pointer"
+                            >
+                                Ready
+                            </button>
+                        </div>
+                    ) : (
+                        <motion.p
+                            layout
+                            transition={{ duration: 0.1, ease: "easeIn" }}
+                            className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-white dark:bg-black p-4"
+                        >
+                            {guidance !== "none"
+                                ? GUIDANCE_TEXT[guidance]
+                                : PHASE_TEXT[phase]}
+                        </motion.p>
+                    )
+                ) : (
+                    <motion.p
+                        layout
+                        transition={{ duration: 0.1, ease: "easeIn" }}
+                        className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-white dark:bg-black p-4"
+                    >
+                        {guidance !== "none"
+                            ? GUIDANCE_TEXT[guidance]
+                            : PHASE_TEXT[phase]}
+                    </motion.p>
+                )}
 
                 <div className="absolute z-30 right-0 bottom-1/2 translate-y-1/2">
                     {images.length ? (
                         images.map((_, key) => (
                             <p className="bg-white dark:bg-black p-6" key={key}>
-                                Image teken
+                                Image taken
                                 <br />
                                 {exText[key].map(
                                     (te: { text: string }, i: number) => (
@@ -417,6 +412,7 @@ const Camera = () => {
                                         </React.Fragment>
                                     ),
                                 )}
+                                <img className="w-[5em]" src={images[key]} alt={String(key)} width={100} height={100} />
                             </p>
                         ))
                     ) : (
