@@ -9,7 +9,6 @@ import { useAppContext } from "@/context/AppContext";
 import useFullScreen from "@/libs/FullScreen";
 import { Guidance, ScanPhase } from "@/types/camera.type";
 import { GUIDANCE_TEXT, PHASE_TEXT } from "@/const/camera";
-import React from "react";
 
 const Camera = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -375,7 +374,7 @@ const Camera = () => {
                             </button>
                         </div>
                     ) : (
-                        <motion.p
+                        <motion.div
                             layout
                             transition={{ duration: 0.1, ease: "easeIn" }}
                             className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-white dark:bg-black text-sm rounded-2xl py-4 px-6"
@@ -383,7 +382,7 @@ const Camera = () => {
                             {guidance !== "none"
                                 ? GUIDANCE_TEXT[guidance]
                                 : PHASE_TEXT[phase]}
-                        </motion.p>
+                        </motion.div>
                     )
                 ) : (
                     <motion.div

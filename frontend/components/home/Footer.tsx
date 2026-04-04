@@ -3,7 +3,7 @@ import { HiExternalLink } from "react-icons/hi";
 
 const Footer = () => {
     return (
-        <footer className="mb-[1em] text-xs text-center text-[#9b9b9b]">
+        <footer className="mb-[1em] text-[0.65rem] md:text-xs text-center text-[#9b9b9b]">
             <p className="text-center">
                 All the data we use for this validation is collected from <br />
             </p>
