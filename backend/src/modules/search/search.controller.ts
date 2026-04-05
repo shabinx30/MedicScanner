@@ -6,9 +6,10 @@ export class SearchController {
 
     async searchMedicine(req: Request, res: Response) {
         try {
-            
-        } catch (error) {
-            
+            const medicine = await this.searchService.searchMedicine(req.body);
+            return res.json(medicine);
+        } catch (error: any) {
+            res.status(500).json({ error: error.message });
         }
     }
 }
