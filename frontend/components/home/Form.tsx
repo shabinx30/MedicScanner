@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { TbRosetteDiscountCheck } from "react-icons/tb";
 
@@ -11,6 +11,7 @@ const Form = () => {
                     className="text-xs border border-gray-400 dark:border-[#4b4b4b] rounded-lg outline-none focus:border-[#41f5ff] py-3 px-3"
                     id="product_name"
                     placeholder="e.g. Paracetamol 500mg"
+                    maxLength={60}
                     type="text"
                 />
             </div>
@@ -21,12 +22,16 @@ const Form = () => {
                     id="batch_no"
                     placeholder="e.g. BN3L244"
                     autoCapitalize="characters"
+                    maxLength={20}
                     onChange={(e) => {
                         const cursor = e.target.selectionStart;
 
-                        const upperValue = e.target.value.toUpperCase();
+                        const value = e.target.value.replaceAll(
+                            /[^a-zA-Z0-9]/g,
+                            "",
+                        );
 
-                        e.target.value = upperValue;
+                        e.target.value = value.toUpperCase();
 
                         requestAnimationFrame(() => {
                             e.target.setSelectionRange(cursor, cursor);
