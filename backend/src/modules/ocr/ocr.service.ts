@@ -1,9 +1,9 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 import { systemInstruction } from "../../const/ai-instruction.js";
 
 export class OcrService {
     private readonly genAI: GoogleGenAI;
-    private readonly modelId = "gemini-3.1-flash-lite-preview";
+    private readonly modelId = "gemini-2.5-flash-lite";
     constructor() {
         this.genAI = new GoogleGenAI({
             apiKey: process.env.GEMINI_API_KEY as string,
@@ -17,6 +17,7 @@ export class OcrService {
     }
 
     async extractMedicineInfo(images: string[]) {
+        console.log({ images });
         const imageParts = images.map((img) => ({
             inlineData: {
                 data: this.cleanBase64(img),
@@ -31,12 +32,15 @@ export class OcrService {
                 config: {
                     systemInstruction: systemInstruction,
                     responseMimeType: "application/json",
+                    // thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
                 },
             });
 
+            console.log(response.text)
             return JSON.parse(response.text as string);
         } catch (error: any) {
-            console.log("error while tunning ocr", error.message);
+            console.log("error while running ocr", error.message);
+            throw error;
         }
     }
 }

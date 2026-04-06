@@ -338,7 +338,7 @@ const Camera = () => {
             console.log(images);
             (async () => {
                 const res = await submitImages(images);
-                console.log(res.data)
+                console.log(res)
             })();
         }
     }, [phase, images]);
