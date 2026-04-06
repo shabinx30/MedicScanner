@@ -9,6 +9,7 @@ import { useAppContext } from "@/context/AppContext";
 import useFullScreen from "@/libs/FullScreen";
 import { Guidance, ScanPhase } from "@/types/camera.type";
 import { GUIDANCE_TEXT, PHASE_TEXT } from "@/const/camera";
+import { submitImages } from "@/services";
 
 const Camera = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -334,7 +335,11 @@ const Camera = () => {
     // When phase === 'done', send both to NestJS
     useEffect(() => {
         if (phase === "done" && images.length >= 2) {
-            // console.log(images);
+            console.log(images);
+            (async () => {
+                const res = await submitImages(images);
+                console.log(res.data)
+            })();
         }
     }, [phase, images]);
 
@@ -348,9 +353,7 @@ const Camera = () => {
                     href="/"
                     className="absolute top-2.5 md:top-7.5 left-2.5 md:left-7.5 z-40 bg-white dark:bg-[#1b1b1b] py-2.5 px-3.5 rounded-2xl"
                 >
-                    <IoArrowBackOutline
-                        size={25}
-                    />
+                    <IoArrowBackOutline size={25} />
                 </Link>
                 {!isEngineLoaded && (
                     <h3 className="absolute z-30 bottom-1/2 right-1/2 translate-y-1/2 translate-x-1/2">
