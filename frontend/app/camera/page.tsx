@@ -15,7 +15,8 @@ const Camera = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
     const cameraPage = useRef<HTMLDivElement>(null);
-    const { isEngineLoaded, setEnginLoaded } = useAppContext();
+    const { isEngineLoaded, setEnginLoaded, images, setImages } =
+        useAppContext();
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const frontFrameRef = useRef<string | null>(null);
     const loopRef = useRef<number>(0);
@@ -23,7 +24,6 @@ const Camera = () => {
 
     const [phase, setPhase] = useState<ScanPhase>("detecting");
     const [guidance, setGuidance] = useState<Guidance>("no_object");
-    const [images, setImages] = useState<string[]>([]);
     const [exText, setExText] = useState<any>([]);
     const [isFlipped, setFlipped] = useState(false);
     const [readyBtn, setReadyBtn] = useState(false);
@@ -338,7 +338,7 @@ const Camera = () => {
             console.log(images);
             (async () => {
                 const res = await submitImages(images);
-                console.log(res)
+                console.log(res);
             })();
         }
     }, [phase, images]);

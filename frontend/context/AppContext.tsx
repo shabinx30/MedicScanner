@@ -12,17 +12,22 @@ import {
 interface IContext {
     isEngineLoaded: boolean;
     setEnginLoaded: Dispatch<SetStateAction<boolean>>;
+    images: string[];
+    setImages: Dispatch<SetStateAction<string[]>>;
 }
 
 export const AppContext = createContext<IContext | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
     const [isEngineLoaded, setEnginLoaded] = useState(false);
+    const [images, setImages] = useState<string[]>([]);
 
     const value = useMemo(
         () => ({
             isEngineLoaded,
             setEnginLoaded,
+            images,
+            setImages,
         }),
         [isEngineLoaded],
     );

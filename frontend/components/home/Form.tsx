@@ -1,27 +1,29 @@
 "use client";
 
-import { findMedicine } from "@/services";
-import { IMedicineInfo } from "@/types/medicine.type";
-import { SubmitEvent, useState } from "react";
+import { SubmitEvent, useRef } from "react";
 import { TbRosetteDiscountCheck } from "react-icons/tb";
+import { useRouter } from "next/navigation";
 
 const Form = () => {
-    const [formData, setFormData] = useState<IMedicineInfo>({
-        medicineName: "",
-        batchNo: "",
-    });
-
-    const updateFormData = (
-        state: "medicineName" | "batchNo",
-        value: string,
-    ) => {
-        setFormData((p) => ({ ...p, [state]: value }));
-    };
+    const router = useRouter();
+    const medicineNameRef = useRef<HTMLInputElement>(null);
+    const batchNoRef = useRef<HTMLInputElement>(null);
 
     const handleSubmit = async (e: SubmitEvent) => {
         e.preventDefault();
-        const res = await findMedicine(formData);
-        console.log(res)
+        if (medicineNameRef.current && batchNoRef.current) {
+            if (!medicineNameRef.current.value.trim()) {
+                return;
+            }
+
+            if (!batchNoRef.current.value.trim()) {
+                return;
+            }
+
+            router.push(
+                `/result?medicineName=${medicineNameRef.current.value}&batchNo=${batchNoRef.current.value}`,
+            );
+        }
     };
 
     return (
@@ -32,19 +34,18 @@ const Form = () => {
             <div className="flex flex-col gap-1">
                 <label htmlFor="product_name">Product Name</label>
                 <input
+                    ref={medicineNameRef}
                     className="text-xs border-2 border-gray-300 dark:border-[#4b4b4b] rounded-lg outline-none focus:border-2 focus:border-black dark:focus:border-white py-3 px-3"
                     id="product_name"
                     placeholder="e.g. Paracetamol 500mg"
                     maxLength={60}
-                    onChange={(e) => {
-                        updateFormData("medicineName", e.target.value);
-                    }}
                     type="text"
                 />
             </div>
             <div className="flex flex-col gap-1">
                 <label htmlFor="batch_no">Batch Number</label>
                 <input
+                    ref={batchNoRef}
                     className="text-xs border-2 border-gray-300 dark:border-[#4b4b4b] rounded-lg outline-none focus:border-2 focus:border-black dark:focus:border-white py-3 px-3"
                     id="batch_no"
                     placeholder="e.g. BN3L244"
@@ -60,8 +61,6 @@ const Form = () => {
 
                         const uppercase = value.toUpperCase();
                         e.target.value = uppercase;
-
-                        updateFormData("batchNo", uppercase);
 
                         requestAnimationFrame(() => {
                             e.target.setSelectionRange(cursor, cursor);
