@@ -54,12 +54,8 @@ const Form = () => {
                     onChange={(e) => {
                         const cursor = e.target.selectionStart;
 
-                        const value = e.target.value.replaceAll(
-                            /[^a-zA-Z0-9]/g,
-                            "",
-                        );
-
-                        const uppercase = value.toUpperCase();
+                        const uppercase = e.target.value.toUpperCase()
+                        
                         e.target.value = uppercase;
 
                         requestAnimationFrame(() => {
