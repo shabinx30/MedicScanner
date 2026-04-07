@@ -9,6 +9,6 @@ const repo = new SearchRepository()
 const service = new SearchService(repo)
 const controller = new SearchController(service)
 
-searchRouter.get("/search-medicine", controller.searchMedicine.bind(controller))
+searchRouter.post("/search-medicine", controller.searchMedicine.bind(controller))
 
 export default searchRouter;
