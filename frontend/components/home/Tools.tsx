@@ -7,10 +7,10 @@ import Form from "./Form";
 const Tools = () => {
     return (
         <section className="max-w-[calc(100vw-1em)]">
-            <div className="border border-gray-300 dark:border-[#4b4b4b] py-4 rounded-4xl px-4">
+            <div className="border border-gray-400 dark:border-[#4b4b4b] py-4 rounded-4xl px-4">
                 <Link
                     href="/camera"
-                    className="bg-[#41f5ff] hover:bg-[#41f5ff]/75 duration-300 font-semibold flex justify-between gap-[6em] md:gap-[8.5em] items-center w-full cursor-pointer text-black px-5 py-5 rounded-2xl"
+                    className="bg-[#24868b] hover:bg-[#24868b]/75 duration-300 font-semibold flex justify-between gap-[6em] md:gap-[8.5em] items-center w-full cursor-pointer text-white px-5 py-5 rounded-2xl"
                 >
                     <div className="flex gap-3">
                         <LuScanText size={22} />
@@ -18,7 +18,7 @@ const Tools = () => {
                     </div>
                     <SlArrowRight />
                 </Link>
-                <div className="mt-2 bg-gray-100 hover:bg-gray-200 dark:bg-[#2b2b2b] dark:hover:bg-[#1b1b1b] duration-300 flex justify-center gap-3 px-5 py-3 rounded-2xl items-center">
+                <div className="mt-2 bg-[#c2fcff] hover:bg-gray-200 dark:bg-[#2b2b2b] dark:hover:bg-[#1b1b1b] duration-300 flex justify-center gap-3 px-5 py-3 rounded-2xl items-center">
                     <IoCloudUploadOutline size={21} />
                     Upload Image
                 </div>
