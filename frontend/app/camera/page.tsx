@@ -9,7 +9,7 @@ import { useAppContext } from "@/context/AppContext";
 import useFullScreen from "@/libs/FullScreen";
 import { Guidance, ScanPhase } from "@/types/camera.type";
 import { GUIDANCE_TEXT, PHASE_TEXT } from "@/const/camera";
-import { submitImages } from "@/services";
+import { useRouter } from "next/navigation";
 
 const Camera = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -28,6 +28,7 @@ const Camera = () => {
     const [isFlipped, setFlipped] = useState(false);
     const [readyBtn, setReadyBtn] = useState(false);
     const [isUserReady, setUserReady] = useState(false);
+    const router = useRouter()
 
     // fullscreen related
     const { tryFullscreen } = useFullScreen(cameraPage);
@@ -335,11 +336,7 @@ const Camera = () => {
     // When phase === 'done', send both to NestJS
     useEffect(() => {
         if (phase === "done" && images.length >= 2) {
-            console.log(images);
-            (async () => {
-                const res = await submitImages(images);
-                console.log(res);
-            })();
+            router.push("/result")
         }
     }, [phase, images]);
 
