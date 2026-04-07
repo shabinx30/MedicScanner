@@ -19,13 +19,14 @@ import { TbReport } from "react-icons/tb";
 
 const Result = () => {
     const searchParams = useSearchParams();
-    const { images } = useAppContext();
+    const { images, setImages } = useAppContext();
     const [result, setResult] = useState<IResult>();
 
     useEffect(() => {
         (async () => {
             if (images.length) {
                 const res = await submitImages(images);
+                setImages([])
                 setResult(() => {
                     return res;
                 });
