@@ -1,7 +1,7 @@
 import type { IMedicine } from "../../types/medicine.type.js";
 import type { SearchRepository } from "./search.repository.js";
 
-export class searchService {
+export class SearchService {
     constructor(private searchRepository: SearchRepository) {}
 
     async searchMedicine(queries: IMedicine) {

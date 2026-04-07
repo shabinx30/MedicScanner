@@ -6,7 +6,7 @@ export class OcrController {
 
     async extractText(req: Request, res: Response) {
         try {
-            const result = await this.ocrService.extractMedicineInfo(req.body.images);
+            const result = await this.ocrService.findMedicineInfo(req.body.images);
             res.json(result);
         } catch (error: any) {
             res.status(500).json({ message: error.message });
