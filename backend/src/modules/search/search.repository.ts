@@ -15,9 +15,12 @@ export class SearchRepository {
             orConditions.push({ str_manufactured_by: queries.brandName });
         }
 
-        return await MedicinModel.findOne({
-            $or: orConditions,
-            str_batch_no: batchNo,
-        });
+        return await MedicinModel.findOne(
+            {
+                $or: orConditions,
+                str_batch_no: batchNo,
+            },
+            { _id: 0 },
+        );
     }
 }

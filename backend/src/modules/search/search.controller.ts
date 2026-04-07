@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
-import type { searchService } from "./search.service.js";
+import type { SearchService } from "./search.service.js";
 
 export class SearchController {
-    constructor(private searchService: searchService) {}
+    constructor(private searchService: SearchService) {}
 
     async searchMedicine(req: Request, res: Response) {
         try {
