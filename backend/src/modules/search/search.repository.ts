@@ -5,8 +5,10 @@ export class SearchRepository {
     async searchMedicine(queries: IMedicine) {
         const { medicineName, batchNo } = queries;
 
-        const orConditions: Record<string, string>[] = [
-            { str_product_name: medicineName },
+        const words = medicineName.split(" ").join("|");
+
+        const orConditions: Record<string, RegExp | string>[] = [
+            { str_product_name: new RegExp(words, "i") },
         ];
 
         if (queries.brandName) {
