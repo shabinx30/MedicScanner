@@ -29,7 +29,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             images,
             setImages,
         }),
-        [isEngineLoaded],
+        [isEngineLoaded, images],
     );
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
