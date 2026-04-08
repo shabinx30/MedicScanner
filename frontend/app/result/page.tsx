@@ -68,10 +68,10 @@ const Result = () => {
                     Authentication process complete. Review the clinical
                     findings and authenticity markers below.
                 </p>
-                <div className="mt-10 w-full md:flex gap-2 hidden  justify-between">
+                <div className="mt-10 w-full flex gap-2 justify-center md:justify-between">
                     <Link
                         href="/"
-                        className="flex bg-[#8dc3c6] dark:bg-[#0d3234] px-4 py-1.5 rounded-xl items-center gap-2"
+                        className="md:flex hidden bg-[#8dc3c6] dark:bg-[#0d3234] px-4 py-1.5 rounded-xl items-center gap-2"
                     >
                         <BsArrowCounterclockwise />
                         Check Another Medicine
@@ -84,7 +84,7 @@ const Result = () => {
                         Share
                     </Link>
                 </div>
-                <section className="flex flex-col lg:flex-row w-full gap-4 mt-10 md:mt-0">
+                <section className="flex flex-col lg:flex-row w-full gap-4">
                     <div className="min-h-full flex-1/3 bg-[#24868b] dark:bg-[#196165] rounded-2xl p-6">
                         <div className="flex items-center justify-between">
                             <p
@@ -108,7 +108,7 @@ const Result = () => {
                                     )}
                                 </span>
                             </p>
-                            {result?.str_nsq_result?.length! > 10 && (
+                            {result?.is_nsq && result?.str_nsq_result?.length! > 10 && (
                                 <p className="text-sm hidden lg:flex items-center gap-1">
                                     <TbReport />
                                     Reported from:{" "}
@@ -145,7 +145,7 @@ const Result = () => {
                             {result?.is_nsq ? (
                                 <p className="text-red-500">{result.str_nsq_result}</p>
                             ) : (
-                                <p className="text-white">
+                                <p className="dark:text-white">
                                     This product matches the manufacturer's
                                     spectral fingerprint and packaging
                                     standards. No anomalies detected in the
@@ -158,7 +158,7 @@ const Result = () => {
                                 </p>
                             )}
                         </div>
-                        {result?.str_nsq_result?.length! <= 10 && (
+                        {result?.is_nsq && result?.str_nsq_result?.length! <= 10 && (
                             <p className="mt-4 text-sm flex items-center gap-1">
                                 <TbReport />
                                 Reported from:{" "}
@@ -167,7 +167,7 @@ const Result = () => {
                                 </span>
                             </p>
                         )}
-                        {result?.str_nsq_result?.length! > 10 && (
+                        {result?.is_nsq && result?.str_nsq_result?.length! > 10 && (
                             <p className="text-sm lg:hidden mt-4 flex justify-center items-center gap-1">
                                 <TbReport />
                                 Reported from:
@@ -205,13 +205,6 @@ const Result = () => {
                     >
                         <BsArrowCounterclockwise />
                         Check Another Medicine
-                    </Link>
-                    <Link
-                        href="/"
-                        className="flex bg-[#8dc3c6] dark:bg-[#0d3234] px-4 py-1.5 rounded-xl items-center gap-2"
-                    >
-                        <HiOutlineShare />
-                        Share
                     </Link>
                 </div>
                 <section className="flex justify-center mt-10">
