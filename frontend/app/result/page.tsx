@@ -29,7 +29,7 @@ const Result = () => {
                 setResult(() => {
                     return res;
                 });
-                setImages([])
+                setImages([]);
                 return;
             }
             const medicineName = searchParams.get("medicineName");
@@ -45,6 +45,24 @@ const Result = () => {
             });
         })();
     }, []);
+
+    async function shareSite() {
+        if (navigator.share) {
+            try {
+                const medicineName = searchParams.get("medicineName");
+
+                await navigator.share({
+                    title: "Check this out!",
+                    text: `Medicine Details of ${medicineName}`,
+                    url: new URL(window.location.href).href,
+                });
+            } catch (error) {
+                console.log("Error sharing:", error);
+            }
+        } else {
+            console.log("web share not supported");
+        }
+    }
 
     return (
         <>
@@ -76,16 +94,16 @@ const Result = () => {
                         <BsArrowCounterclockwise />
                         Check Another Medicine
                     </Link>
-                    <Link
-                        href="/"
-                        className="flex bg-[#8dc3c6] dark:bg-[#0d3234] px-4 py-1.5 rounded-xl items-center gap-2"
+                    <button
+                        onClick={shareSite}
+                        className="flex bg-[#8dc3c6] dark:bg-[#0d3234] px-4 py-1.5 rounded-xl items-center gap-2 cursor-pointer"
                     >
                         <HiOutlineShare />
                         Share
-                    </Link>
+                    </button>
                 </div>
                 <section className="flex flex-col lg:flex-row w-full gap-4">
-                    <div className="min-h-full flex-1/3 bg-[#24868b] dark:bg-[#196165] rounded-2xl p-6">
+                    <div className="flex flex-col min-h-full flex-1/3 bg-[#24868b] dark:bg-[#196165] rounded-2xl p-6">
                         <div className="flex items-center justify-between">
                             <p
                                 className={`flex w-fit items-start gap-1.5 ${result?.is_nsq ? "bg-red-300" : "bg-[#3fff68]"} text-black rounded-full py-1.5 px-3 text-[0.6rem] uppercase`}
@@ -108,15 +126,18 @@ const Result = () => {
                                     )}
                                 </span>
                             </p>
-                            {result?.is_nsq && result?.str_nsq_result?.length! > 10 && (
-                                <p className="text-sm hidden lg:flex items-center gap-1">
-                                    <TbReport />
-                                    Reported from:{" "}
-                                    <span className="font-semibold">
-                                        {result?.str_reported_by_lab_or_state}
-                                    </span>
-                                </p>
-                            )}
+                            {result?.is_nsq &&
+                                result?.str_nsq_result?.length! > 10 && (
+                                    <p className="text-sm hidden xl:flex items-center gap-1">
+                                        <TbReport />
+                                        Reported from:{" "}
+                                        <span className="font-semibold">
+                                            {
+                                                result?.str_reported_by_lab_or_state
+                                            }
+                                        </span>
+                                    </p>
+                                )}
                         </div>
                         <h3
                             className={`text-3xl ${result?.is_nsq ? "text-red-500" : "text-white"} mt-4`}
@@ -131,7 +152,7 @@ const Result = () => {
                                 {result?.str_batch_no}
                             </span>
                         </p>
-                        <div className="text-sm px-6 py-5 bg-[#dafdff] dark:bg-[#0d3234] mt-6 rounded-xl">
+                        <div className="text-sm px-6 py-5 flex-1 flex flex-col justify-center bg-[#dafdff] dark:bg-[#0d3234] mt-6 rounded-xl">
                             <h4 className="uppercase font-semibold mb-3 flex items-center gap-2">
                                 {result?.is_nsq ? (
                                     <TbReport size={17} />
@@ -143,7 +164,9 @@ const Result = () => {
                                     : "Summary"}
                             </h4>
                             {result?.is_nsq ? (
-                                <p className="text-red-500">{result.str_nsq_result}</p>
+                                <p className="text-red-500">
+                                    {result.str_nsq_result}
+                                </p>
                             ) : (
                                 <p className="dark:text-white">
                                     This product matches the manufacturer's
@@ -158,24 +181,26 @@ const Result = () => {
                                 </p>
                             )}
                         </div>
-                        {result?.is_nsq && result?.str_nsq_result?.length! <= 10 && (
-                            <p className="mt-4 text-sm flex items-center gap-1">
-                                <TbReport />
-                                Reported from:{" "}
-                                <span className="font-semibold flex items-center">
-                                    {result?.str_reported_by_lab_or_state}
-                                </span>
-                            </p>
-                        )}
-                        {result?.is_nsq && result?.str_nsq_result?.length! > 10 && (
-                            <p className="text-sm lg:hidden mt-4 flex justify-center items-center gap-1">
-                                <TbReport />
-                                Reported from:
-                                <span className="font-semibold">
-                                    {result?.str_reported_by_lab_or_state}
-                                </span>
-                            </p>
-                        )}
+                        {result?.is_nsq &&
+                            result?.str_nsq_result?.length! <= 10 && (
+                                <p className="mt-4 text-sm flex items-center gap-1">
+                                    <TbReport />
+                                    Reported from:{" "}
+                                    <span className="font-semibold flex items-center">
+                                        {result?.str_reported_by_lab_or_state}
+                                    </span>
+                                </p>
+                            )}
+                        {result?.is_nsq &&
+                            result?.str_nsq_result?.length! > 10 && (
+                                <p className="text-sm xl:hidden mt-4 flex justify-center items-center gap-1">
+                                    <TbReport />
+                                    Reported from:
+                                    <span className="font-semibold">
+                                        {result?.str_reported_by_lab_or_state}
+                                    </span>
+                                </p>
+                            )}
                     </div>
                     <div className="flex flex-col justify-center flex-1 min-h-full text-white bg-[#24868b] dark:bg-[#196165] rounded-2xl p-6">
                         <h5 className="font-semibold">Manufacturer Info</h5>
