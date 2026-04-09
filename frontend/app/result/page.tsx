@@ -26,10 +26,10 @@ const Result = () => {
         (async () => {
             if (images.length) {
                 const res = await submitImages(images);
-                setImages([])
                 setResult(() => {
                     return res;
                 });
+                setImages([])
                 return;
             }
             const medicineName = searchParams.get("medicineName");

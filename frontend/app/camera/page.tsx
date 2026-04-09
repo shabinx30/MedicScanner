@@ -28,7 +28,7 @@ const Camera = () => {
     const [isFlipped, setFlipped] = useState(false);
     const [readyBtn, setReadyBtn] = useState(false);
     const [isUserReady, setUserReady] = useState(false);
-    const router = useRouter()
+    const router = useRouter();
 
     // fullscreen related
     const { tryFullscreen } = useFullScreen(cameraPage);
@@ -164,13 +164,18 @@ const Camera = () => {
 
         gray.delete();
 
+        if (texts.length < 2) return { pass: false, reason: "no_object" as Guidance };
+
+        const t0 = texts[0].text;
+        const t1 = texts[1].text;
+
         if (
-            texts.length >= 2 &&
-            (texts[0].text.length > 4 || texts[1].text.length > 4)
+            t0.length > 4 ||
+            t1.length > 4 ||
+            t0.startsWith("B.No") ||
+            t0.startsWith("Batch")
         ) {
-            setExText((p: any) => {
-                return [...p, texts];
-            });
+            setExText((p: any) => [...p, texts]);
             return { pass: true, reason: "none" as Guidance };
         }
 
@@ -336,7 +341,7 @@ const Camera = () => {
     // When phase === 'done', send both to NestJS
     useEffect(() => {
         if (phase === "done" && images.length >= 2) {
-            router.push("/result")
+            router.push("/result");
         }
     }, [phase, images]);
 
