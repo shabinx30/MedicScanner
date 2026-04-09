@@ -38,6 +38,10 @@ export class OcrService {
             });
 
             console.log(response.text);
+            if (response.text === "not_a_medicine") {
+                return { error: "NOT_A_MEDICINE" };
+            }
+
             const rawText = response.text as string;
             // Extract the actual JSON object to avoid parsing errors from trailing characters
             const match = rawText.match(/\{[\s\S]*\}/);
@@ -53,6 +57,10 @@ export class OcrService {
 
     async findMedicineInfo(images: string[]) {
         const medicine_info = await this.extractMedicineInfo(images);
+
+        if(medicine_info.error) {
+            return medicine_info
+        }
 
         const { str_product_name, str_batch_no, str_manufactured_by } =
             medicine_info;
@@ -84,7 +92,7 @@ export class OcrService {
                 str_reporting_source: "N/A",
                 str_reported_by_lab_or_state: "N/A",
                 dt_reporting_month_year: "N/A",
-                is_nsq: false
+                is_nsq: false,
             };
         }
         return medicine;
