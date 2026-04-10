@@ -2,5 +2,8 @@ ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
 
+onlyBuiltDependencies:
+  - esbuild
+
 patchedDependencies:
   js-clipper@1.0.1: patches/js-clipper@1.0.1.patch
