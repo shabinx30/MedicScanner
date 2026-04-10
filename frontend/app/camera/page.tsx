@@ -245,7 +245,7 @@ const Camera = () => {
     // When phase === 'done', send both to NestJS
     useEffect(() => {
         if (phase === "done" && images.length >= 2) {
-            router.push("/result");
+            router.push("/result?source=images");
         }
     }, [phase, images]);
 

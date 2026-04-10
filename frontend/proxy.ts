@@ -6,6 +6,11 @@ export function proxy(request: NextRequest) {
     if (request.nextUrl.pathname.startsWith("/result")) {
         const medicinName = searchParams.has("medicineName");
         const batchNo = searchParams.has("batchNo");
+        const source = searchParams.has("source");
+
+        if(source) {
+            return NextResponse.next()
+        }
 
         if (!medicinName || !batchNo) {
             return NextResponse.redirect(new URL("/", request.url));

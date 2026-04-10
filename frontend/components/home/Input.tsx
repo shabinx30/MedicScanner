@@ -84,7 +84,7 @@ const Input = () => {
 
                 imageBitmap.close();
             }
-            router.push("/result");
+            router.push("/result?source=images");
         } catch (error) {
             console.log(error);
             return;
