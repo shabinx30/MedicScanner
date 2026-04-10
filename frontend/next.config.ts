@@ -10,10 +10,26 @@ const nextConfig: NextConfig = {
     turbopack: {
         resolveAlias: {
             // Stub out Node.js built-ins for browser builds
-            // opencv.js conditionally requires these but doesn't need them in browser
             fs: { browser: "./empty-module.ts" },
             path: { browser: "./empty-module.ts" },
         },
+    },
+    async headers() {
+        return [
+            {
+                source: "/(.*)",
+                headers: [
+                    {
+                        key: "Cross-Origin-Opener-Policy",
+                        value: "same-origin",
+                    },
+                    {
+                        key: "Cross-Origin-Embedder-Policy",
+                        value: "require-corp",
+                    },
+                ],
+            },
+        ];
     },
 };
 

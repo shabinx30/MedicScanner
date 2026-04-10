@@ -29,7 +29,7 @@ const Form = () => {
     return (
         <form
             onSubmit={handleSubmit}
-            className="text-sm border border-gray-400 dark:border-[#4b4b4b] flex flex-col gap-4 pt-6 pb-4 rounded-4xl px-4"
+            className="text-sm border border-gray-400/75 dark:border-[#4b4b4b] flex flex-col gap-4 pt-6 pb-4 rounded-4xl px-4"
         >
             <div className="flex flex-col gap-1">
                 <label htmlFor="product_name">Product Name</label>

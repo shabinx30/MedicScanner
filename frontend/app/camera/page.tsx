@@ -10,25 +10,32 @@ import useFullScreen from "@/libs/FullScreen";
 import { Guidance, ScanPhase } from "@/types/camera.type";
 import { GUIDANCE_TEXT, PHASE_TEXT } from "@/const/camera";
 import { useRouter } from "next/navigation";
+import useScanner from "@/libs/Scanner";
 
 const Camera = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
     const cameraPage = useRef<HTMLDivElement>(null);
-    const { isEngineLoaded, setEnginLoaded, images, setImages } =
-        useAppContext();
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const {
+        isEngineLoaded,
+        setEnginLoaded,
+        images,
+        setImages,
+        canvasRef,
+        textRecWorkerRef,
+    } = useAppContext();
+
     const frontFrameRef = useRef<string | null>(null);
     const loopRef = useRef<number>(0);
-    const textRecWorkerRef = useRef<Worker | null>(null);
 
     const [phase, setPhase] = useState<ScanPhase>("detecting");
     const [guidance, setGuidance] = useState<Guidance>("no_object");
-    const [exText, setExText] = useState<any>([]);
     const [isFlipped, setFlipped] = useState(false);
     const [readyBtn, setReadyBtn] = useState(false);
     const [isUserReady, setUserReady] = useState(false);
     const router = useRouter();
+
+    const { runChecks } = useScanner();
 
     // fullscreen related
     const { tryFullscreen } = useFullScreen(cameraPage);
@@ -62,7 +69,7 @@ const Camera = () => {
         })();
 
         textRecWorkerRef.current = new Worker(
-            new URL("@/workers/text_rec.worker.ts", import.meta.url),
+            "/text_rec.worker.bundle.js",
         );
 
         return () => {
@@ -114,109 +121,6 @@ const Camera = () => {
 
         tryStart();
     }, [phase, isEngineLoaded]);
-
-    const runChecks = async (cv: any, src: any) => {
-        const frameArea = src.rows * src.cols;
-        const gray = new cv.Mat();
-        cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-
-        // Brighness check
-        const brightness = cv.mean(gray)[0];
-        if (brightness < 50) {
-            gray.delete();
-            return { pass: false, reason: "dark" as Guidance };
-        }
-
-        // Glare check
-        const thresh = new cv.Mat();
-        cv.threshold(gray, thresh, 240, 255, cv.THRESH_BINARY);
-        const glarePixel = cv.countNonZero(thresh);
-        thresh.delete();
-
-        if (glarePixel > frameArea * 0.05) {
-            gray.delete();
-            return { pass: false, reason: "glare" as Guidance };
-        }
-
-        // Blur Check (use variance of Laplacian as sharpness metric)
-        const laplacian = new cv.Mat();
-        cv.Laplacian(gray, laplacian, cv.CV_64F);
-
-        const mean = new cv.Mat();
-        const stddev = new cv.Mat();
-
-        cv.meanStdDev(laplacian, mean, stddev);
-
-        // variance = stddev²
-        const variance = Math.pow(stddev.doubleAt(0, 0), 2);
-
-        laplacian.delete();
-        mean.delete();
-        stddev.delete();
-
-        // console.log(variance)
-        if (variance < 65) {
-            gray.delete();
-            return { pass: false, reason: "hold_steady" as Guidance };
-        }
-
-        const texts = await handleTextDetection();
-
-        gray.delete();
-
-        if (texts.length < 2) return { pass: false, reason: "no_object" as Guidance };
-
-        const t0 = texts[0].text;
-        const t1 = texts[1].text;
-
-        if (
-            t0.length > 4 ||
-            t1.length > 4 ||
-            t0.startsWith("B.No") ||
-            t0.startsWith("Batch")
-        ) {
-            setExText((p: any) => [...p, texts]);
-            return { pass: true, reason: "none" as Guidance };
-        }
-
-        return { pass: false, reason: "no_object" as Guidance };
-    };
-
-    const handleTextDetection = async (): Promise<any[]> => {
-        if (!isEngineLoaded || !canvasRef.current || !textRecWorkerRef.current)
-            return [];
-
-        return new Promise((resolve) => {
-            try {
-                const tempCanvas = document.createElement("canvas");
-                tempCanvas.width = 640;
-                tempCanvas.height = 640;
-                const tempCtx = tempCanvas.getContext("2d");
-                if (tempCtx && canvasRef.current) {
-                    tempCtx.drawImage(canvasRef.current, 0, 0, 640, 640);
-                }
-
-                const imageDataUrl = tempCanvas.toDataURL("image/jpeg", 0.8);
-
-                const handleMessage = (e: MessageEvent) => {
-                    textRecWorkerRef.current!.removeEventListener(
-                        "message",
-                        handleMessage,
-                    );
-                    resolve(e.data || []);
-                };
-
-                textRecWorkerRef.current!.addEventListener(
-                    "message",
-                    handleMessage,
-                );
-                textRecWorkerRef.current!.postMessage(imageDataUrl);
-            } catch (error) {
-                console.log("failed to trigger worker text detection", error);
-                resolve([]);
-            }
-        });
-    };
 
     const startDetectionLoop = (mode: "front" | "flip") => {
         const cv = (window as any).cv;

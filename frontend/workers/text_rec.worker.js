@@ -1,9 +1,12 @@
-import type OCR from "@gutenye/ocr-browser"
+import Ocr from "@gutenye/ocr-browser";
+import * as ort from "onnxruntime-web";
+
+ort.env.wasm.wasmPaths = "/";
 
 // Polyfill document and Image for @gutenye/ocr-browser to run cleanly in Web Worker
-if (typeof (self as any).document === "undefined") {
-    (self as any).document = {
-        createElement: (tag: string) => {
+if (typeof self.document === "undefined") {
+    self.document = {
+        createElement: (tag) => {
             if (tag === "canvas") {
                 return new OffscreenCanvas(1, 1);
             }
@@ -13,14 +16,16 @@ if (typeof (self as any).document === "undefined") {
     };
 }
 
-if (typeof (self as any).Image === "undefined") {
+if (typeof self.Image === "undefined") {
     class WorkerImage {
-        src: string = "";
-        naturalWidth: number = 0;
-        naturalHeight: number = 0;
-        width: number = 0;
-        height: number = 0;
-        _bitmap: ImageBitmap | null = null;
+        constructor() {
+            this.src = "";
+            this.naturalWidth = 0;
+            this.naturalHeight = 0;
+            this.width = 0;
+            this.height = 0;
+            this._bitmap = null;
+        }
 
         async decode() {
             if (!this.src) return;
@@ -34,11 +39,11 @@ if (typeof (self as any).Image === "undefined") {
         }
     }
 
-    (self as any).Image = WorkerImage;
+    self.Image = WorkerImage;
 
     // Proxy drawImage so it extracts the actual ImageBitmap
-    const originalDrawImage = (self as any).OffscreenCanvasRenderingContext2D.prototype.drawImage;
-    (self as any).OffscreenCanvasRenderingContext2D.prototype.drawImage = function (img: any, ...args: any[]) {
+    const originalDrawImage = self.OffscreenCanvasRenderingContext2D.prototype.drawImage;
+    self.OffscreenCanvasRenderingContext2D.prototype.drawImage = function (img, ...args) {
         if (img instanceof WorkerImage && img._bitmap) {
             return originalDrawImage.call(this, img._bitmap, ...args);
         }
@@ -46,12 +51,10 @@ if (typeof (self as any).Image === "undefined") {
     };
 }
 
-let ocrInstence: any = null;
+let ocrInstence = null;
 
 async function getOcr() {
     if (ocrInstence) return ocrInstence;
-
-    const Ocr = (await import("@gutenye/ocr-browser")).default;
 
     ocrInstence = await Ocr.create({
         models: {
@@ -67,7 +70,7 @@ async function getOcr() {
 self.onmessage = async (e) => {
     const imageDataUrl = e.data;
     try {
-        const ocr = await getOcr() as OCR;
+        const ocr = await getOcr();
 
         const result = await ocr.detect(imageDataUrl);
         self.postMessage(result);

@@ -7,6 +7,8 @@ const Images = () => {
                 className="hidden md:block absolute top-1/4 left-1/9 w-[7em]"
                 src="/star.avif"
                 alt="star"
+                loading="eager"
+                priority
                 width={100}
                 height={100}
             />
@@ -14,6 +16,8 @@ const Images = () => {
                 className="hidden md:block absolute bottom-1/4 right-1/9"
                 src="/dimond.avif"
                 alt="star"
+                loading="eager"
+                priority
                 width={100}
                 height={100}
             />
