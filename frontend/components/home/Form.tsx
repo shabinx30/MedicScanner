@@ -3,20 +3,25 @@
 import { SubmitEvent, useRef } from "react";
 import { TbRosetteDiscountCheck } from "react-icons/tb";
 import { useRouter } from "next/navigation";
+import { useAppContext } from "@/context/AppContext";
+import { showError } from "@/libs/error";
 
 const Form = () => {
     const router = useRouter();
     const medicineNameRef = useRef<HTMLInputElement>(null);
     const batchNoRef = useRef<HTMLInputElement>(null);
+    const { setError } = useAppContext();
 
     const handleSubmit = async (e: SubmitEvent) => {
         e.preventDefault();
         if (medicineNameRef.current && batchNoRef.current) {
             if (!medicineNameRef.current.value.trim()) {
+                showError("Enter the medicine name", setError)
                 return;
             }
 
             if (!batchNoRef.current.value.trim()) {
+                showError("Enter the batch number", setError)
                 return;
             }
 
@@ -54,8 +59,8 @@ const Form = () => {
                     onChange={(e) => {
                         const cursor = e.target.selectionStart;
 
-                        const uppercase = e.target.value.toUpperCase()
-                        
+                        const uppercase = e.target.value.toUpperCase();
+
                         e.target.value = uppercase;
 
                         requestAnimationFrame(() => {

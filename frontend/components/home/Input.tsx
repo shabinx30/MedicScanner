@@ -1,23 +1,20 @@
 "use client";
 
 import { useAppContext } from "@/context/AppContext";
+import { showError } from "@/libs/error";
 import useScanner from "@/libs/Scanner";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { IoCloudUploadOutline } from "react-icons/io5";
 
 const Input = () => {
-    const { canvasRef, isEngineLoaded, setEnginLoaded, setImages } =
+    const { canvasRef, isEngineLoaded, setEnginLoaded, setImages, setError } =
         useAppContext();
     const { runChecks } = useScanner();
     const router = useRouter();
 
     const handleUploadImage = async () => {
         const cv = (window as any).cv;
-        if (!cv || typeof cv.Mat !== "function") {
-            console.log("OpenCV is still loading, please wait...");
-            return;
-        }
 
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext("2d", { willReadFrequently: true });
@@ -42,7 +39,7 @@ const Input = () => {
             );
 
             if (fileHandle.length > 4) {
-                console.log("only upto 4 image supported");
+                showError("Only upto 4 image supported", setError);
                 return;
             }
 
@@ -65,7 +62,18 @@ const Input = () => {
                     const src = cv.imread(canvas);
                     const result = await runChecks(cv, src);
                     if (!result.pass) {
-                        console.log(`failed to scan ${result.reason}`);
+                        let reason;
+                        if (result.reason === "dark") {
+                            reason = "it's too dark";
+                        } else if (result.reason === "glare") {
+                            reason = "it contains too much glare";
+                        } else if (result.reason === "hold_steady") {
+                            reason = "the image got blurred";
+                        } else {
+                            reason = "we couldn't find the medicine";
+                        }
+
+                        showError(`Try to upload a better image, ${reason}`, setError)
                         imageBitmap.close();
                         return;
                     }
@@ -78,7 +86,7 @@ const Input = () => {
             }
             router.push("/result");
         } catch (error) {
-            console.log(error)
+            console.log(error);
             return;
         }
     };

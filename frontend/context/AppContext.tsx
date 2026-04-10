@@ -20,6 +20,8 @@ interface IContext {
     setExText: Dispatch<any>;
     exText: any;
     textRecWorkerRef: RefObject<Worker | null>;
+    error: string;
+    setError: Dispatch<SetStateAction<string>>;
 }
 
 export const AppContext = createContext<IContext | undefined>(undefined);
@@ -30,6 +32,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [exText, setExText] = useState<any>([]);
     const textRecWorkerRef = useRef<Worker | null>(null);
+    const [error, setError] = useState("");
 
     const value = useMemo(
         () => ({
@@ -40,9 +43,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             canvasRef,
             setExText,
             exText,
-            textRecWorkerRef
+            textRecWorkerRef,
+            error,
+            setError,
         }),
-        [isEngineLoaded, images, canvasRef, exText, textRecWorkerRef],
+        [isEngineLoaded, images, canvasRef, exText, textRecWorkerRef, error],
     );
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
