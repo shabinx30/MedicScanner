@@ -1,13 +1,11 @@
 "use client";
 
-import { GiMedicines } from "react-icons/gi";
 import { IoShieldCheckmarkSharp } from "react-icons/io5";
 import { CgQuoteO } from "react-icons/cg";
 import Link from "next/link";
-import { LuTriangleAlert } from "react-icons/lu";
 import { BsArrowCounterclockwise } from "react-icons/bs";
 import { HiOutlineShare } from "react-icons/hi2";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useAppContext } from "@/context/AppContext";
 import { findMedicine, submitImages } from "@/services";
 import { useEffect, useState } from "react";
@@ -16,40 +14,55 @@ import { MdDangerous } from "react-icons/md";
 import { PiBuildingsFill } from "react-icons/pi";
 import { HiCalendarDateRange } from "react-icons/hi2";
 import { TbReport } from "react-icons/tb";
+import Skeleton from "@/components/result/Skeleton";
 
 const Result = () => {
     const searchParams = useSearchParams();
     const { images, setImages } = useAppContext();
     const [result, setResult] = useState<IResult>();
+    const router = useRouter();
+    const pathname = usePathname();
+    const [isLoading, setLoading] = useState(true);
 
     useEffect(() => {
         (async () => {
             if (images.length) {
-                const res = await submitImages(images);
+                const res = (await submitImages(images)) as IResult;
                 setResult(() => {
                     return res;
                 });
+                setLoading(false);
+
+                const params = new URLSearchParams(searchParams.toString());
+                params.set("medicineName", res.str_product_name);
+                params.set("batchNo", res.str_batch_no);
+
+                router.push(`${pathname}?${params.toString()}`, {
+                    scroll: false,
+                });
+
                 setImages([]);
                 return;
             }
             const medicineName = searchParams.get("medicineName");
             const batchNo = searchParams.get("batchNo");
 
-            const res = await findMedicine({
+            const res = (await findMedicine({
                 medicineName,
                 batchNo,
-            } as IMedicineInfo);
+            } as IMedicineInfo)) as IResult;
 
             setResult(() => {
                 return res;
             });
+            setLoading(false);
         })();
     }, []);
 
     async function shareSite() {
         if (navigator.share) {
             try {
-                const medicineName = searchParams.get("medicineName");
+                const medicineName = result?.str_product_name;
 
                 await navigator.share({
                     title: "Check this out!",
@@ -64,28 +77,11 @@ const Result = () => {
         }
     }
 
-    return (
-        <>
-            <nav className="pl-3 pt-3">
-                <Link
-                    href="/"
-                    className="text-xs md:text-sm font-boldonse flex gap-1.5 items-center text-center uppercase"
-                >
-                    <GiMedicines
-                        className="text-black dark:text-[#24868b]"
-                        size={18}
-                    />
-                    Medic Scanner
-                </Link>
-            </nav>
-            <main className="flex flex-col items-center py-10 md:py-6 gap-3 px-[10%]">
-                <h2 className="text-xl md:text-2xl font-boldonse">
-                    Verification Results
-                </h2>
-                <p className="w-full md:w-1/2 lg:w-1/3 text-center leading-tight tracking-wide text-sm text-gray-600">
-                    Authentication process complete. Review the clinical
-                    findings and authenticity markers below.
-                </p>
+    if (isLoading) {
+        return <Skeleton />;
+    } else {
+        return (
+            <>
                 <div className="mt-10 w-full flex gap-2 justify-center md:justify-between">
                     <Link
                         href="/"
@@ -232,24 +228,9 @@ const Result = () => {
                         Check Another Medicine
                     </Link>
                 </div>
-                <section className="flex justify-center mt-10">
-                    <div className="flex flex-col items-center">
-                        <div className="flex text-sm items-center gap-2 bg-red-200 dark:bg-red-500/25 text-red-800 dark:text-red-300 w-fit px-3 py-1.5 rounded-xl">
-                            <LuTriangleAlert />
-                            Legal Disclaimer
-                        </div>
-                        <p className="text-sm text-center mt-3 md:w-1/2 text-gray-500">
-                            This verification is an auxiliary tool and does not
-                            replace the advice of a medical doctor. If you
-                            suspect your medicine is compromised despite these
-                            results, do not consume it and contact your local
-                            regulatory authority immediately.
-                        </p>
-                    </div>
-                </section>
-            </main>
-        </>
-    );
+            </>
+        );
+    }
 };
 
 export default Result;
