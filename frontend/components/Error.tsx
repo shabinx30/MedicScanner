@@ -21,7 +21,7 @@ const Error = () => {
                         animate={{ y: 0 }}
                         exit={{ y: -100 }}
                         transition={{ duration: 0.25 }}
-                        className="py-2 px-6 shadow-2xl bg-red-200 text-red-700 w-fit mx-auto mt-5 rounded-xl"
+                        className="py-2 px-6 shadow-2xl bg-red-200 text-red-700 w-fit mx-auto mt-5 rounded-xl text-sm md:text-base"
                     >
                         {error}
                     </motion.div>
