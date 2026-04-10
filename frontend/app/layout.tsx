@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Boldonse } from "next/font/google";
 
 import "./globals.css";
 import { AppProvider } from "@/context/AppContext";
+import Error from "@/components/Error";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -36,7 +37,10 @@ export default function RootLayout({
             className={`${geistSans.variable} ${geistMono.variable} ${boldonse.variable} h-full antialiased`}
         >
             <body className="min-h-full flex flex-col">
-                <AppProvider>{children}</AppProvider>
+                <AppProvider>
+                    <Error />
+                    {children}
+                </AppProvider>
             </body>
         </html>
     );
