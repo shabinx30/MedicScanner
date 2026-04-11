@@ -3,6 +3,7 @@ import searchRouter from "./modules/search/search.route.js";
 import { connectDB } from "./config/db.js";
 import ocrRouter from "./modules/ocr/ocr.route.js";
 import cors from "cors"
+import cronRouter from "./modules/cron/cron.route.js";
 
 const app: Application = Express();
 
@@ -20,6 +21,7 @@ app.use(Express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use("/", searchRouter);
 app.use("/ocr", ocrRouter);
+app.use("/cron", cronRouter);
 
 app.listen(5000, async () => {
     await connectDB();
