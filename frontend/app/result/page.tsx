@@ -63,17 +63,17 @@ const Result = () => {
         if (navigator.share) {
             try {
                 const medicineName = result?.str_product_name;
+                const shareUrl = window.location.href;
 
                 await navigator.share({
                     title: "Check this out!",
-                    text: `Medicine Details of ${medicineName}`,
-                    url: new URL(window.location.href).href,
+                    text: `Medicine Details of ${medicineName}\n\n${shareUrl}`,
                 });
             } catch (error) {
                 console.log("Error sharing:", error);
             }
         } else {
-            console.log("web share not supported");
+            console.log("Web share not supported");
         }
     }
 
@@ -102,7 +102,7 @@ const Result = () => {
                     <div className="flex flex-col min-h-full flex-1/3 bg-[#24868b] dark:bg-[#196165] rounded-2xl p-6">
                         <div className="flex items-center justify-between">
                             <p
-                                className={`flex w-fit items-start gap-1.5 ${result?.is_nsq ? "bg-red-300" : "bg-[#3fff68]"} text-black rounded-full py-1.5 px-3 text-[0.6rem] uppercase`}
+                                className={`flex w-fit items-center gap-1.5 ${result?.is_nsq ? "bg-red-300" : "bg-[#3fff68]"} text-black rounded-full py-1.5 px-3 text-[0.5rem] md:text-[0.6rem] uppercase`}
                             >
                                 {result?.is_nsq ? (
                                     <MdDangerous size={15} />
