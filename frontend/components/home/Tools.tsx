@@ -13,7 +13,7 @@ const Tools = () => {
                     href="/camera"
                     className="bg-[#24868b] hover:bg-[#24868b]/75 duration-300 font-semibold flex justify-between gap-[6em] md:gap-[8.5em] items-center w-full cursor-pointer text-white px-5 py-5 rounded-2xl"
                 >
-                    <div className="flex gap-3">
+                    <div className="flex gap-3 items-center">
                         <LuScanText size={22} />
                         Open Scanner
                     </div>
