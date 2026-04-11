@@ -99,7 +99,7 @@ const Result = () => {
                     </button>
                 </div>
                 <section className="flex flex-col lg:flex-row w-full gap-4">
-                    <div className="flex flex-col min-h-full flex-1/3 bg-[#24868b] dark:bg-[#196165] rounded-2xl p-4 md:p-6">
+                    <div className="flex flex-col min-h-full flex-1/3 bg-[#24868b] dark:bg-[#196165] rounded-3xl p-4 md:p-6">
                         <div className="flex items-center justify-between">
                             <p
                                 className={`flex w-fit items-center gap-1.5 ${result?.is_nsq ? "bg-red-300" : "bg-[#3fff68]"} text-black rounded-full py-1.5 px-3 text-[0.5rem] md:text-[0.6rem] uppercase`}
@@ -198,7 +198,7 @@ const Result = () => {
                                 </p>
                             )}
                     </div>
-                    <div className="flex flex-col justify-center flex-1 min-h-full text-white bg-[#24868b] dark:bg-[#196165] rounded-2xl p-6">
+                    <div className="flex flex-col justify-center flex-1 min-h-full text-white bg-[#24868b] dark:bg-[#196165] rounded-3xl p-4 md:p-6">
                         <h5 className="font-semibold">Manufacturer Info</h5>
                         <h6 className="text-sm mt-8 text-gray-300 flex items-center gap-2">
                             <PiBuildingsFill />
