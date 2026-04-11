@@ -68,9 +68,7 @@ const Camera = () => {
             }
         })();
 
-        textRecWorkerRef.current = new Worker(
-            "/text_rec.worker.bundle.js",
-        );
+        textRecWorkerRef.current = new Worker("/text_rec.worker.bundle.js");
 
         return () => {
             if (streamRef.current) {
@@ -253,7 +251,7 @@ const Camera = () => {
         <>
             <div
                 ref={cameraPage}
-                className="h-screen w-screen bg-background relative"
+                className="h-screen w-screen bg-background relative font-sans"
             >
                 <Link
                     href="/"
@@ -268,41 +266,47 @@ const Camera = () => {
                 )}
                 {readyBtn ? (
                     !isUserReady ? (
-                        <div className="absolute right-1/2 translate-x-1/2 text-sm bottom-4 z-30 bg-white dark:bg-[#1b1b1b] py-5 px-7.5 md:px-10 rounded-3xl flex flex-col items-center gap-3">
-                            <p className="text-center">
-                                Ready to take the back side?
-                            </p>
-                            <button
-                                onClick={() => {
-                                    setUserReady(true);
-                                    startDetectionLoop("flip");
-                                }}
-                                className="bg-[#1b1b1b] text-[#41f5ff] dark:bg-[#41f5ff] dark:text-black rounded-2xl px-4 py-1.5 cursor-pointer"
-                            >
-                                Ready
-                            </button>
+                        <div className="absolute bottom-4 z-30 flex w-screen justify-center">
+                            <div className="text-sm bg-white dark:bg-[#1b1b1b] py-5 px-7.5 md:px-10 rounded-3xl flex flex-col items-center gap-3">
+                                <p className="text-center">
+                                    Ready to take the back side?
+                                </p>
+                                <button
+                                    onClick={() => {
+                                        setUserReady(true);
+                                        startDetectionLoop("flip");
+                                    }}
+                                    className="bg-[#1b1b1b] text-[#41f5ff] dark:bg-[#41f5ff] dark:text-black rounded-2xl px-4 py-1.5 cursor-pointer"
+                                >
+                                    Ready
+                                </button>
+                            </div>
                         </div>
                     ) : (
+                        <div className="absolute bottom-4 z-30 w-screen flex justify-center">
+                            <motion.div
+                                layout
+                                transition={{ duration: 0.1, ease: "easeIn" }}
+                                className="bg-white h-fit dark:bg-black text-sm rounded-2xl py-4 px-6"
+                            >
+                                {guidance !== "none"
+                                    ? GUIDANCE_TEXT[guidance]
+                                    : PHASE_TEXT[phase]}
+                            </motion.div>
+                        </div>
+                    )
+                ) : (
+                    <div className="absolute bottom-4 z-30 w-screen flex justify-center">
                         <motion.div
                             layout
                             transition={{ duration: 0.1, ease: "easeIn" }}
-                            className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-white dark:bg-black text-sm rounded-2xl py-4 px-6"
+                            className="bg-white h-fit dark:bg-black text-sm rounded-2xl py-4 px-6"
                         >
                             {guidance !== "none"
                                 ? GUIDANCE_TEXT[guidance]
                                 : PHASE_TEXT[phase]}
                         </motion.div>
-                    )
-                ) : (
-                    <motion.div
-                        layout
-                        transition={{ duration: 0.1, ease: "easeIn" }}
-                        className="absolute right-1/2 translate-x-1/2 bottom-4 z-30 bg-white dark:bg-black text-sm rounded-2xl py-4 px-6"
-                    >
-                        {guidance !== "none"
-                            ? GUIDANCE_TEXT[guidance]
-                            : PHASE_TEXT[phase]}
-                    </motion.div>
+                    </div>
                 )}
                 <motion.div
                     initial={{ opacity: 1, backdropFilter: "blur(10px)" }}

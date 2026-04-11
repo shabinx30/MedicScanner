@@ -15,6 +15,7 @@ import { PiBuildingsFill } from "react-icons/pi";
 import { HiCalendarDateRange } from "react-icons/hi2";
 import { TbReport } from "react-icons/tb";
 import Skeleton from "@/components/result/Skeleton";
+import { HiOutlineLocationMarker } from "react-icons/hi";
 
 const Result = () => {
     const searchParams = useSearchParams();
@@ -92,14 +93,14 @@ const Result = () => {
                     </Link>
                     <button
                         onClick={shareSite}
-                        className="flex bg-[#8dc3c6] dark:bg-[#0d3234] px-4 py-1.5 rounded-xl items-center gap-2 cursor-pointer"
+                        className="flex bg-[#8dc3c6] dark:bg-[#0d3234] text-sm md:text-base px-4 py-1.5 rounded-xl items-center gap-2 cursor-pointer"
                     >
                         <HiOutlineShare />
                         Share
                     </button>
                 </div>
                 <section className="flex flex-col lg:flex-row w-full gap-4">
-                    <div className="flex flex-col min-h-full flex-1/3 bg-[#24868b] dark:bg-[#196165] rounded-3xl p-4 md:p-6">
+                    <div className="flex flex-col min-h-full flex-1/3 bg-[#24868b] dark:bg-[#196165] rounded-3xl p-5 md:p-6">
                         <div className="flex items-center justify-between">
                             <p
                                 className={`flex w-fit items-center gap-1.5 ${result?.is_nsq ? "bg-red-300" : "bg-[#3fff68]"} text-black rounded-full py-1.5 px-3 text-[0.5rem] md:text-[0.6rem] uppercase`}
@@ -125,7 +126,7 @@ const Result = () => {
                             {result?.is_nsq &&
                                 result?.str_nsq_result?.length! > 10 && (
                                     <p className="text-sm hidden xl:flex items-center gap-1">
-                                        <TbReport />
+                                        <HiOutlineLocationMarker />
                                         Reported from:{" "}
                                         <span className="font-semibold">
                                             {
@@ -136,7 +137,7 @@ const Result = () => {
                                 )}
                         </div>
                         <h3
-                            className={`text-3xl ${result?.is_nsq ? "text-red-500" : "text-white"} mt-4`}
+                            className={`text-2xl font-semibold md md:font-medium md:text-3xl ${result?.is_nsq ? "text-red-500" : "text-white"} mt-4`}
                         >
                             {result?.str_product_name}
                         </h3>
@@ -180,7 +181,7 @@ const Result = () => {
                         {result?.is_nsq &&
                             result?.str_nsq_result?.length! <= 10 && (
                                 <p className="mt-4 text-sm flex items-center gap-1">
-                                    <TbReport />
+                                    <HiOutlineLocationMarker />
                                     Reported from:{" "}
                                     <span className="font-semibold flex items-center">
                                         {result?.str_reported_by_lab_or_state}
@@ -190,7 +191,7 @@ const Result = () => {
                         {result?.is_nsq &&
                             result?.str_nsq_result?.length! > 10 && (
                                 <p className="text-sm xl:hidden mt-4 flex justify-center items-center gap-1">
-                                    <TbReport />
+                                    <HiOutlineLocationMarker />
                                     Reported from:
                                     <span className="font-semibold">
                                         {result?.str_reported_by_lab_or_state}
@@ -198,7 +199,7 @@ const Result = () => {
                                 </p>
                             )}
                     </div>
-                    <div className="flex flex-col justify-center flex-1 min-h-full text-white bg-[#24868b] dark:bg-[#196165] rounded-3xl p-4 md:p-6">
+                    <div className="flex flex-col justify-center flex-1 min-h-full text-white bg-[#24868b] dark:bg-[#196165] rounded-3xl p-5 md:p-6">
                         <h5 className="font-semibold">Manufacturer Info</h5>
                         <h6 className="text-sm mt-8 text-gray-300 flex items-center gap-2">
                             <PiBuildingsFill />

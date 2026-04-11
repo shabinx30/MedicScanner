@@ -19,7 +19,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     Medic Scanner
                 </Link>
             </nav>
-            <main className="flex flex-col items-center py-10 md:py-6 gap-3 px-[2%] md:px-[10%]">
+            <main className="flex flex-col items-center font-sans py-10 md:py-6 gap-3 px-[2%] md:px-[10%]">
                 <h2 className="text-xl md:text-2xl font-boldonse">
                     Verification Results
                 </h2>
