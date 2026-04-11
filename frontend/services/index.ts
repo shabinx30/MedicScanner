@@ -3,7 +3,7 @@ import { IMedicineInfo } from "@/types/medicine.type";
 export const submitImages = async (images: string[]) => {
     try {
         const response = await fetch(
-            "http://localhost:5000/ocr/search-medicine",
+            `${process.env.NEXT_PUBLIC_API_URL}/ocr/search-medicine`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -23,7 +23,7 @@ export const submitImages = async (images: string[]) => {
 
 export const findMedicine = async (medicineInfo: IMedicineInfo) => {
     try {
-        const response = await fetch("http://localhost:5000/search-medicine", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/search-medicine`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(medicineInfo),
