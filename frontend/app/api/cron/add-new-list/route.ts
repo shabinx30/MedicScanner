@@ -1,6 +1,6 @@
 import { after } from "next/server";
 
-export async function Get() {
+export async function GET() {
     if (!process.env.API_URL) {
         throw new Error("could not find api url");
     }
