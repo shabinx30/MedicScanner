@@ -1,0 +1,8 @@
+{
+    "crons": [
+        {
+            "path": "/api/cron/add-new-list",
+            "schedule": "0 3 1 * *"
+        }
+    ]
+}
