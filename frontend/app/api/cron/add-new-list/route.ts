@@ -6,8 +6,8 @@ export async function GET() {
     }
 
     after(() => {
-        fetch(process.env.API_URL + "/cron/add-new-list", {
-            method: "GET",
+        fetch(process.env.NEXT_PUBLIC_API_URL + "/cron/add-new-list", {
+            method: "POST",
         }).catch((error) => console.log(error));
     });
 

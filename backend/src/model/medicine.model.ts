@@ -1,3 +1,4 @@
+import type { InferSchemaType } from "mongoose";
 import { model, Schema } from "mongoose";
 
 const medicineSchema = new Schema({
@@ -12,4 +13,6 @@ const medicineSchema = new Schema({
     dt_reporting_month_year: { type: String, required: true },
 });
 
-export const MedicinModel = model("Medicine", medicineSchema)
+export type Medicine = InferSchemaType<typeof medicineSchema>;
+
+export const MedicinModel = model("Medicine", medicineSchema);
