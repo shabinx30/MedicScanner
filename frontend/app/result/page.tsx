@@ -16,10 +16,11 @@ import { HiCalendarDateRange } from "react-icons/hi2";
 import { TbReport } from "react-icons/tb";
 import Skeleton from "@/components/result/Skeleton";
 import { HiOutlineLocationMarker } from "react-icons/hi";
+import { showError } from "@/libs/error";
 
 const Result = () => {
     const searchParams = useSearchParams();
-    const { images, setImages } = useAppContext();
+    const { images, setImages, setError } = useAppContext();
     const [result, setResult] = useState<IResult>();
     const router = useRouter();
     const pathname = usePathname();
@@ -28,7 +29,14 @@ const Result = () => {
     useEffect(() => {
         (async () => {
             if (images.length) {
-                const res = (await submitImages(images)) as IResult;
+                const res = (await submitImages(images)) as IResult & {
+                    message: string;
+                };
+                if (res.message) {
+                    showError(res.message, setError);
+                    router.push("/");
+                    return;
+                }
                 setResult(() => {
                     return res;
                 });
@@ -200,7 +208,9 @@ const Result = () => {
                             )}
                     </div>
                     <div className="text-sm flex flex-col justify-center flex-1 min-h-full text-white bg-[#24868b] dark:bg-[#196165] rounded-3xl p-5 md:p-6">
-                        <h5 className="text-base font-semibold">Manufacturer Info</h5>
+                        <h5 className="text-base font-semibold">
+                            Manufacturer Info
+                        </h5>
                         <h6 className="mt-8 text-gray-300 flex items-center gap-2">
                             <PiBuildingsFill />
                             Registered Producer & Origin

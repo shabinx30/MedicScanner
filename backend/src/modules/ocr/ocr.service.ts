@@ -5,7 +5,7 @@ import type { IMedicine } from "../../types/medicine.type.js";
 
 export class OcrService {
     private readonly genAI: GoogleGenAI;
-    private readonly modelId = "gemini-2.5-flash-lite";
+    private readonly modelId = "gemini-3.1-flash-lite-preview";
     constructor(private searchService: SearchService) {
         this.genAI = new GoogleGenAI({
             apiKey: process.env.GEMINI_API_KEY as string,
@@ -39,7 +39,7 @@ export class OcrService {
 
             console.log(response.text);
             if (response.text === "not_a_medicine") {
-                return { error: "NOT_A_MEDICINE" };
+                return { message: "Invalid medicine" };
             }
 
             const rawText = response.text as string;
@@ -59,7 +59,7 @@ export class OcrService {
         const medicine_info = await this.extractMedicineInfo(images);
 
         if(medicine_info.error) {
-            return medicine_info
+            return medicine_info.error
         }
 
         const { str_product_name, str_batch_no, str_manufactured_by } =
