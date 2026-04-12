@@ -40,7 +40,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                             <LuTriangleAlert />
                             Legal Disclaimer
                         </div>
-                        <p className="text-sm text-center mt-3 md:w-1/2 text-gray-500">
+                        <p className="text-xs md:text-sm text-center mt-3 md:w-1/2 text-gray-500">
                             This verification is an auxiliary tool and does not
                             replace the advice of a medical doctor. If you
                             suspect your medicine is compromised despite these
