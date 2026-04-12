@@ -10,12 +10,12 @@ const Skeleton = () => {
                     <div className="flex items-center justify-between">
                         <p className="p-4 w-3/4 md:w-1/2 bg-[#dafdff] dark:bg-[#0d3234] animate-pulse rounded-2xl"></p>
 
-                        <p className="hidden lg:block p-4 w-1/3 bg-[#dafdff] dark:bg-[#0d3234] animate-pulse rounded-2xl"></p>
+                        <p className="hidden lg:block p-2 w-1/4 bg-[#dafdff] dark:bg-[#0d3234] animate-pulse rounded-2xl"></p>
                     </div>
                     <h3 className="mt-4 p-8 w-3/4 bg-[#dafdff] dark:bg-[#0d3234] animate-pulse rounded-2xl"></h3>
                     <div className="p-16 flex-1 flex flex-col mt-6 rounded-xl bg-[#dafdff] dark:bg-[#0d3234] animate-pulse"></div>
                     <div className="flex justify-center">
-                        <p className="block lg:hidden mt-4 p-4 w-1/3 bg-[#dafdff] dark:bg-[#0d3234] animate-pulse rounded-2xl"></p>
+                        <p className="block lg:hidden mt-4 p-2 w-1/2 bg-[#dafdff] dark:bg-[#0d3234] animate-pulse rounded-2xl"></p>
                     </div>
                 </div>
                 <div className="flex flex-col justify-center flex-1 min-h-full bg-[#24868b] dark:bg-[#196165] rounded-2xl p-6">
