@@ -199,21 +199,21 @@ const Result = () => {
                                 </p>
                             )}
                     </div>
-                    <div className="flex flex-col justify-center flex-1 min-h-full text-white bg-[#24868b] dark:bg-[#196165] rounded-3xl p-5 md:p-6">
-                        <h5 className="font-semibold">Manufacturer Info</h5>
-                        <h6 className="text-sm mt-8 text-gray-300 flex items-center gap-2">
+                    <div className="text-sm flex flex-col justify-center flex-1 min-h-full text-white bg-[#24868b] dark:bg-[#196165] rounded-3xl p-5 md:p-6">
+                        <h5 className="text-base font-semibold">Manufacturer Info</h5>
+                        <h6 className="mt-8 text-gray-300 flex items-center gap-2">
                             <PiBuildingsFill />
                             Registered Producer & Origin
                         </h6>
                         <p className="ml-5.5">{result?.str_manufactured_by}</p>
-                        <h6 className="text-sm mt-4 text-gray-300 flex items-center gap-2">
+                        <h6 className="mt-4 text-gray-300 flex items-center gap-2">
                             <HiCalendarDateRange />
                             Manufacturing Date
                         </h6>
                         <p className="ml-5.5">
                             {result?.dt_manufacturing_date}
                         </p>
-                        <h6 className="text-sm mt-4 text-gray-300 flex items-center gap-2">
+                        <h6 className="mt-4 text-gray-300 flex items-center gap-2">
                             <HiCalendarDateRange />
                             Expiry Date
                         </h6>
