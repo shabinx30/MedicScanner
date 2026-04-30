@@ -49,12 +49,8 @@ const Camera = () => {
     useEffect(() => {
         (async () => {
             try {
-                const width = Math.floor(
-                    window.screen.width * window.devicePixelRatio,
-                );
-                const height = Math.floor(
-                    window.screen.height * window.devicePixelRatio,
-                );
+                const width = 1280
+                const height = 720
 
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
@@ -346,7 +342,7 @@ const Camera = () => {
                                     points={text.box
                                         .map(
                                             (point: number[]) =>
-                                                `${point[0] * 1.5},${point[1] * 1.3}`,
+                                                `${point[0] * 2.3},${point[1] * 1.95}`,
                                         )
                                         .join(" ")}
                                     fill="rgba(0, 255, 0, 0.2)"

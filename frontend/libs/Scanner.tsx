@@ -24,12 +24,8 @@ const useScanner = () => {
 
         return new Promise((resolve) => {
             try {
-                const width = Math.floor(
-                    window.screen.width * window.devicePixelRatio,
-                );
-                const height = Math.floor(
-                    window.screen.height * window.devicePixelRatio,
-                );
+                const width = 1280
+                const height = 720
 
                 const tempCanvas = document.createElement("canvas");
                 tempCanvas.width = width / 2;
@@ -137,7 +133,7 @@ const useScanner = () => {
             setExText(() => {
                 return texts;
             });
-            // return { pass: true, reason: "none" as Guidance };
+            return { pass: true, reason: "none" as Guidance };
         }
 
         return { pass: false, reason: "no_object" as Guidance };
