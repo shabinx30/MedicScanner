@@ -49,8 +49,8 @@ const Camera = () => {
     useEffect(() => {
         (async () => {
             try {
-                const width = 1280
-                const height = 720
+                const width = 1280;
+                const height = 720;
 
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {

@@ -14,7 +14,7 @@ const Input = () => {
         useAppContext();
     const { runChecks } = useScanner();
     const router = useRouter();
-    const [isLoading, setLoading] = useState(false)
+    const [isLoading, setLoading] = useState(false);
 
     const handleUploadImage = async () => {
         const cv = (window as any).cv;
@@ -46,7 +46,7 @@ const Input = () => {
                 return;
             }
 
-            setLoading(true)
+            setLoading(true);
 
             for (const handle of fileHandle) {
                 const file = await handle.getFile();
@@ -78,9 +78,12 @@ const Input = () => {
                             reason = "we couldn't find the medicine";
                         }
 
-                        showError(`Try to upload a better image, ${reason}`, setError)
+                        showError(
+                            `Try to upload a better image, ${reason}`,
+                            setError,
+                        );
                         imageBitmap.close();
-                        setLoading(false)
+                        setLoading(false);
                         return;
                     }
 
@@ -91,7 +94,7 @@ const Input = () => {
                 imageBitmap.close();
             }
 
-            setLoading(false)
+            setLoading(false);
             router.push("/result?source=images");
         } catch (error) {
             console.log(error);
@@ -123,8 +126,16 @@ const Input = () => {
                 }}
                 className={`mt-2 ${isEngineLoaded ? "bg-[#c2fcff] hover:bg-gray-200 dark:bg-[#2b2b2b] dark:hover:bg-[#1b1b1b]" : "bg-gray-300 dark:bg-[#1a1a1a] opacity-60 cursor-wait"} duration-300 flex justify-center gap-3 px-5 py-3 rounded-2xl items-center`}
             >
-                {isLoading ? <AiOutlineLoading3Quarters className="animate-spin" /> : <IoCloudUploadOutline size={21} />}
-                {isEngineLoaded ? isLoading ? "Extracting Details..." : "Upload Images" : "Loading Engine..."}
+                {isLoading ? (
+                    <AiOutlineLoading3Quarters className="animate-spin" />
+                ) : (
+                    <IoCloudUploadOutline size={21} />
+                )}
+                {isEngineLoaded
+                    ? isLoading
+                        ? "Extracting Details..."
+                        : "Upload Images"
+                    : "Loading Engine..."}
                 <canvas ref={canvasRef} className="hidden"></canvas>
             </div>
         </>

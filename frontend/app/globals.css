@@ -28,3 +28,71 @@ body {
 .font-boldonse {
   font-family: var(--font-boldonse);
 }
+
+
+/* Target the 'enter' prop class for mounting elements */
+::view-transition-new(.slide-in) {
+  animation: slide-in-up 300ms ease-in both;
+}
+
+/* Target the 'exit' prop class for unmounting elements */
+::view-transition-old(.slide-out) {
+  animation: slide-out-down 300ms ease-in both;
+}
+
+::view-transition-new(.zoom-in) {
+  animation: zoom-in 300ms ease-in both;
+}
+
+::view-transition-old(.zoom-out) {
+  animation: zoom-out 300ms ease-in both;
+}
+
+/* Standard Keyframes */
+@keyframes slide-in-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out-down {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes zoom-in {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes zoom-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  to {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}

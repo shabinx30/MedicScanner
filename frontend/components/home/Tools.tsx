@@ -5,7 +5,6 @@ import Form from "./Form";
 import Input from "./Input";
 
 const Tools = () => {
-
     return (
         <section className="max-w-[calc(100vw-1em)]">
             <div className="border border-gray-400/75 dark:border-[#4b4b4b] py-4 rounded-4xl px-4">

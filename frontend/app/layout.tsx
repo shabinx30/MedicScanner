@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Boldonse } from "next/font/google";
-
 import "./globals.css";
 import { AppProvider } from "@/context/AppContext";
 import Error from "@/components/Error";
@@ -23,7 +22,8 @@ const boldonse = Boldonse({
 
 export const metadata: Metadata = {
     title: "Medic Scanner",
-    description: "Check if your medicine is safe and reliable before you take it.",
+    description:
+        "Check if your medicine is safe and reliable before you take it.",
 };
 
 export default function RootLayout({
