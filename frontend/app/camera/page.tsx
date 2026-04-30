@@ -23,6 +23,8 @@ const Camera = () => {
         setImages,
         canvasRef,
         textRecWorkerRef,
+        exText,
+        setExText,
     } = useAppContext();
 
     const frontFrameRef = useRef<string | null>(null);
@@ -155,6 +157,7 @@ const Camera = () => {
                     if (pass) {
                         captureImage(canvas, "front");
                         setPhase("front_captured");
+                        setTimeout(() => setExText([]), 1000);
                         setTimeout(() => setPhase("waiting_flip"), 1500);
                         src.delete();
                         return;
@@ -176,6 +179,7 @@ const Camera = () => {
                         if (pass) {
                             captureImage(canvas, "back");
                             setPhase("back_captured");
+                            setTimeout(() => setExText([]), 1000);
                             setTimeout(() => setPhase("done"), 1500);
                             src.delete();
                             return;
@@ -324,6 +328,27 @@ const Camera = () => {
                 <div
                     className={`absolute w-full h-full z-23 transition-colors duration-300 ${guidance === "glare" ? "bg-red-500/25" : guidance === "hold_steady" ? "bg-blue-500/25" : "bg-transparent"}`}
                 ></div>
+                {exText.length && exText[0].box ? (
+                    <svg className="absolute w-screen h-screen z-22">
+                        {exText.map((text: { box: [] }, index: number) => (
+                            <g key={index}>
+                                <polygon
+                                    points={text.box
+                                        .map(
+                                            (point: number[]) =>
+                                                `${point[0]*2.25},${point[1]*2}`,
+                                        )
+                                        .join(" ")}
+                                    fill="rgba(0, 255, 0, 0.2)"
+                                    stroke="#00FF00"
+                                    strokeWidth="2"
+                                />
+                            </g>
+                        ))}
+                    </svg>
+                ) : (
+                    <></>
+                )}
                 <div className="flex h-screen justify-center items-center relative">
                     <video
                         ref={videoRef}

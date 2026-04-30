@@ -26,10 +26,10 @@ const useScanner = () => {
             try {
                 const tempCanvas = document.createElement("canvas");
                 tempCanvas.width = 640;
-                tempCanvas.height = 640;
+                tempCanvas.height = 360;
                 const tempCtx = tempCanvas.getContext("2d");
                 if (tempCtx && canvasRef.current) {
-                    tempCtx.drawImage(canvasRef.current, 0, 0, 640, 640);
+                    tempCtx.drawImage(canvasRef.current, 0, 0, 640, 360);
                 }
 
                 const imageDataUrl = tempCanvas.toDataURL("image/jpeg", 0.8);
@@ -63,6 +63,7 @@ const useScanner = () => {
         const brightness = cv.mean(gray)[0];
         if (brightness < 50) {
             gray.delete();
+            setExText([])
             return { pass: false, reason: "dark" as Guidance };
         }
 
@@ -74,6 +75,7 @@ const useScanner = () => {
 
         if (glarePixel > frameArea * 0.05) {
             gray.delete();
+            setExText([])
             return { pass: false, reason: "glare" as Guidance };
         }
 
@@ -96,6 +98,7 @@ const useScanner = () => {
         // console.log(variance)
         if (variance < 65) {
             gray.delete();
+            setExText([])
             return { pass: false, reason: "hold_steady" as Guidance };
         }
 
@@ -105,6 +108,7 @@ const useScanner = () => {
 
         if (texts.length < 2) {
             console.log("from text_rec");
+            setExText([])
             return { pass: false, reason: "no_object" as Guidance };
         }
 
@@ -117,7 +121,9 @@ const useScanner = () => {
             t0.startsWith("B.No") ||
             t0.startsWith("Batch")
         ) {
-            setExText((p: any) => [...p, texts]);
+            setExText(() => {
+                return texts
+            });
             return { pass: true, reason: "none" as Guidance };
         }
 
