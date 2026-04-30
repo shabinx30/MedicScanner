@@ -16,12 +16,12 @@ const Form = () => {
         e.preventDefault();
         if (medicineNameRef.current && batchNoRef.current) {
             if (!medicineNameRef.current.value.trim()) {
-                showError("Enter the medicine name", setError)
+                showError("Enter the medicine name", setError);
                 return;
             }
 
             if (!batchNoRef.current.value.trim()) {
-                showError("Enter the batch number", setError)
+                showError("Enter the batch number", setError);
                 return;
             }
 

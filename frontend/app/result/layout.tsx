@@ -1,12 +1,12 @@
 import Skeleton from "@/components/result/Skeleton";
 import Link from "next/link";
-import React, { Suspense } from "react";
+import React, { Suspense, ViewTransition } from "react";
 import { GiMedicines } from "react-icons/gi";
 import { LuTriangleAlert } from "react-icons/lu";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     return (
-        <>
+        <ViewTransition enter="slide-in" exit="slide-out">
             <nav className="pl-3 pt-3">
                 <Link
                     href="/"
@@ -27,13 +27,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     Authentication process complete. Review the clinical
                     findings and authenticity markers below.
                 </p>
-                <Suspense
-                    fallback={
-                        <Skeleton />
-                    }
-                >
-                    {children}
-                </Suspense>
+                <Suspense fallback={<Skeleton />}>{children}</Suspense>
                 <section className="flex justify-center mt-10">
                     <div className="flex flex-col items-center">
                         <div className="flex text-sm items-center gap-2 bg-red-200 dark:bg-red-500/25 text-red-800 dark:text-red-300 w-fit px-3 py-1.5 rounded-xl">
@@ -50,7 +44,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     </div>
                 </section>
             </main>
-        </>
+        </ViewTransition>
     );
 };
 
