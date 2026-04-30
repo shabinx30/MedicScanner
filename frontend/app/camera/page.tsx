@@ -49,11 +49,18 @@ const Camera = () => {
     useEffect(() => {
         (async () => {
             try {
+                const width = Math.floor(
+                    window.screen.width * window.devicePixelRatio,
+                );
+                const height = Math.floor(
+                    window.screen.height * window.devicePixelRatio,
+                );
+
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: "environment",
-                        width: window.screen.width,
-                        height: window.screen.height,
+                        width: width,
+                        height: height,
                     },
                     audio: false,
                 });
@@ -339,7 +346,7 @@ const Camera = () => {
                                     points={text.box
                                         .map(
                                             (point: number[]) =>
-                                                `${point[0] * 2},${point[1] * 1.75}`,
+                                                `${point[0] * 1.5},${point[1] * 1.3}`,
                                         )
                                         .join(" ")}
                                     fill="rgba(0, 255, 0, 0.2)"
@@ -359,7 +366,7 @@ const Camera = () => {
                         playsInline
                         muted
                         // style={{ transform: "scaleX(-1)" }}
-                        className="w-screen h-screen md:rounded-4xl object-cover object-center"
+                        className={`h-screen w-screen md:rounded-4xl object-center object-cover`}
                     ></video>
                     <canvas ref={canvasRef} className="hidden"></canvas>
                 </div>

@@ -24,17 +24,24 @@ const useScanner = () => {
 
         return new Promise((resolve) => {
             try {
+                const width = Math.floor(
+                    window.screen.width * window.devicePixelRatio,
+                );
+                const height = Math.floor(
+                    window.screen.height * window.devicePixelRatio,
+                );
+
                 const tempCanvas = document.createElement("canvas");
-                tempCanvas.width = window.screen.width / 2;
-                tempCanvas.height = window.screen.height / 2;
+                tempCanvas.width = width / 2;
+                tempCanvas.height = height / 2;
                 const tempCtx = tempCanvas.getContext("2d");
                 if (tempCtx && canvasRef.current) {
                     tempCtx.drawImage(
                         canvasRef.current,
                         0,
                         0,
-                        window.screen.width / 2,
-                        window.screen.height / 2,
+                        width / 2,
+                        height / 2,
                     );
                 }
 
@@ -130,7 +137,7 @@ const useScanner = () => {
             setExText(() => {
                 return texts;
             });
-            return { pass: true, reason: "none" as Guidance };
+            // return { pass: true, reason: "none" as Guidance };
         }
 
         return { pass: false, reason: "no_object" as Guidance };
