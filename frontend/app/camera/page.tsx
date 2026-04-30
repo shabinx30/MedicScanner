@@ -52,8 +52,8 @@ const Camera = () => {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: "environment",
-                        width: 1280,
-                        height: 720,
+                        width: window.screen.width,
+                        height: window.screen.height,
                     },
                     audio: false,
                 });
@@ -152,13 +152,13 @@ const Camera = () => {
 
                 if (mode === "front") {
                     const { pass, reason } = await runChecks(cv, src);
-                    setGuidance(reason);
+                    setGuidance(() => reason);
 
                     if (pass) {
                         captureImage(canvas, "front");
-                        setPhase("front_captured");
-                        setTimeout(() => setExText([]), 1000);
-                        setTimeout(() => setPhase("waiting_flip"), 1500);
+                        setPhase(() => "front_captured");
+                        setTimeout(() => setExText(() => []), 1000);
+                        setTimeout(() => setPhase(() => "waiting_flip"), 1500);
                         src.delete();
                         return;
                     }
@@ -169,18 +169,18 @@ const Camera = () => {
                         if (!isFlipped) {
                             const flipped = detectFlip(cv, src, canvas);
                             if (flipped) {
-                                setFlipped(true);
-                                setReadyBtn(true);
+                                setFlipped(() => true);
+                                setReadyBtn(() => true);
                                 return;
                             }
                         }
                         const { pass, reason } = await runChecks(cv, src);
-                        setGuidance(reason);
+                        setGuidance(() => reason);
                         if (pass) {
                             captureImage(canvas, "back");
-                            setPhase("back_captured");
-                            setTimeout(() => setExText([]), 1000);
-                            setTimeout(() => setPhase("done"), 1500);
+                            setPhase(() => "back_captured");
+                            setTimeout(() => setExText(() => []), 1000);
+                            setTimeout(() => setPhase(() => "done"), 1500);
                             src.delete();
                             return;
                         }
@@ -328,15 +328,18 @@ const Camera = () => {
                 <div
                     className={`absolute w-full h-full z-23 transition-colors duration-300 ${guidance === "glare" ? "bg-red-500/25" : guidance === "hold_steady" ? "bg-blue-500/25" : "bg-transparent"}`}
                 ></div>
+                <div
+                    className={`absolute w-full h-full z-23 transition-colors duration-300 ${exText.length && exText[0].box ? "bg-black/50" : "bg-transparent"}`}
+                ></div>
                 {exText.length && exText[0].box ? (
-                    <svg className="absolute w-screen h-screen z-22">
+                    <svg className="absolute w-screen h-screen z-24">
                         {exText.map((text: { box: [] }, index: number) => (
                             <g key={index}>
                                 <polygon
                                     points={text.box
                                         .map(
                                             (point: number[]) =>
-                                                `${point[0]*2.25},${point[1]*2}`,
+                                                `${point[0] * 2},${point[1] * 1.75}`,
                                         )
                                         .join(" ")}
                                     fill="rgba(0, 255, 0, 0.2)"
