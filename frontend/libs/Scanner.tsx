@@ -25,11 +25,17 @@ const useScanner = () => {
         return new Promise((resolve) => {
             try {
                 const tempCanvas = document.createElement("canvas");
-                tempCanvas.width = 640;
-                tempCanvas.height = 360;
+                tempCanvas.width = window.screen.width / 2;
+                tempCanvas.height = window.screen.height / 2;
                 const tempCtx = tempCanvas.getContext("2d");
                 if (tempCtx && canvasRef.current) {
-                    tempCtx.drawImage(canvasRef.current, 0, 0, 640, 360);
+                    tempCtx.drawImage(
+                        canvasRef.current,
+                        0,
+                        0,
+                        window.screen.width / 2,
+                        window.screen.height / 2,
+                    );
                 }
 
                 const imageDataUrl = tempCanvas.toDataURL("image/jpeg", 0.8);
@@ -63,7 +69,7 @@ const useScanner = () => {
         const brightness = cv.mean(gray)[0];
         if (brightness < 50) {
             gray.delete();
-            setExText([])
+            setExText([]);
             return { pass: false, reason: "dark" as Guidance };
         }
 
@@ -75,7 +81,7 @@ const useScanner = () => {
 
         if (glarePixel > frameArea * 0.05) {
             gray.delete();
-            setExText([])
+            setExText([]);
             return { pass: false, reason: "glare" as Guidance };
         }
 
@@ -98,7 +104,7 @@ const useScanner = () => {
         // console.log(variance)
         if (variance < 65) {
             gray.delete();
-            setExText([])
+            setExText([]);
             return { pass: false, reason: "hold_steady" as Guidance };
         }
 
@@ -108,7 +114,7 @@ const useScanner = () => {
 
         if (texts.length < 2) {
             console.log("from text_rec");
-            setExText([])
+            setExText([]);
             return { pass: false, reason: "no_object" as Guidance };
         }
 
@@ -122,7 +128,7 @@ const useScanner = () => {
             t0.startsWith("Batch")
         ) {
             setExText(() => {
-                return texts
+                return texts;
             });
             return { pass: true, reason: "none" as Guidance };
         }
