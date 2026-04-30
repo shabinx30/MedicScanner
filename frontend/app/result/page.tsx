@@ -28,43 +28,48 @@ const Result = () => {
 
     useEffect(() => {
         (async () => {
-            if (images.length) {
-                const res = (await submitImages(images)) as IResult & {
-                    message: string;
-                };
-                if (res.message) {
-                    showError(res.message, setError);
-                    router.push("/");
+            try {
+                if (images.length) {
+                    const res = (await submitImages(images)) as IResult & {
+                        message: string;
+                    };
+                    if (res.message) {
+                        showError(res.message, setError);
+                        router.push("/");
+                        return;
+                    }
+                    setResult(() => {
+                        return res;
+                    });
+                    setLoading(false);
+
+                    const params = new URLSearchParams(searchParams.toString());
+                    params.set("medicineName", res.str_product_name);
+                    params.set("batchNo", res.str_batch_no);
+
+                    router.push(`${pathname}?${params.toString()}`, {
+                        scroll: false,
+                    });
+
+                    setImages([]);
                     return;
                 }
+                const medicineName = searchParams.get("medicineName");
+                const batchNo = searchParams.get("batchNo");
+
+                const res = (await findMedicine({
+                    medicineName,
+                    batchNo,
+                } as IMedicineInfo)) as IResult;
+
                 setResult(() => {
                     return res;
                 });
                 setLoading(false);
-
-                const params = new URLSearchParams(searchParams.toString());
-                params.set("medicineName", res.str_product_name);
-                params.set("batchNo", res.str_batch_no);
-
-                router.push(`${pathname}?${params.toString()}`, {
-                    scroll: false,
-                });
-
-                setImages([]);
-                return;
+            } catch (error) {
+                showError("Something went wrong!", setError);
+                router.push("/");
             }
-            const medicineName = searchParams.get("medicineName");
-            const batchNo = searchParams.get("batchNo");
-
-            const res = (await findMedicine({
-                medicineName,
-                batchNo,
-            } as IMedicineInfo)) as IResult;
-
-            setResult(() => {
-                return res;
-            });
-            setLoading(false);
         })();
     }, []);
 
