@@ -345,8 +345,8 @@ const Camera = () => {
                                                 `${point[0] * 2.3},${point[1] * 1.95}`,
                                         )
                                         .join(" ")}
-                                    fill="rgba(0, 255, 0, 0.2)"
-                                    stroke="#00FF00"
+                                    fill="#43f6ff52"
+                                    stroke="#43f6ff"
                                     strokeWidth="2"
                                 />
                             </g>
