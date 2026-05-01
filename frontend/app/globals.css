@@ -3,6 +3,7 @@
 :root {
   --background: #effeff;
   --foreground: #171717;
+  --power3-out: cubic-bezier(0.215, 0.610, 0.355, 1.000);
 }
 
 @theme inline {
@@ -32,20 +33,20 @@ body {
 
 /* Target the 'enter' prop class for mounting elements */
 ::view-transition-new(.slide-in) {
-  animation: slide-in-up 300ms ease-in both;
+  animation: slide-in-up 0.7s var(--power3-out) both;
 }
 
 /* Target the 'exit' prop class for unmounting elements */
 ::view-transition-old(.slide-out) {
-  animation: slide-out-down 300ms ease-in both;
+  animation: slide-out-down 0.7s var(--power3-out) both;
 }
 
 ::view-transition-new(.zoom-in) {
-  animation: zoom-in 300ms ease-in both;
+  animation: zoom-in 0.7s var(--power3-out) both;
 }
 
 ::view-transition-old(.zoom-out) {
-  animation: zoom-out 300ms ease-in both;
+  animation: zoom-out 0.7s var(--power3-out) both;
 }
 
 /* Standard Keyframes */
