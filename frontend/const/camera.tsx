@@ -11,20 +11,20 @@ export const GUIDANCE_TEXT: Record<Guidance, JSX.Element | string> = {
     no_object: "Point the camera at the medicine",
     move_closer: "Move closer to the medicine",
     hold_steady: (
-        <div className="flex items-center gap-2">
-            <PiVibrateFill />
+        <div className="items-center">
+            <PiVibrateFill className="mx-auto my-6" size={40} />
             Hold steady...
         </div>
     ),
     glare: (
-        <div className="flex items-center gap-2">
-            <BsSunFill size={15} />
+        <div className="items-center">
+            <BsSunFill className="mx-auto my-6" size={40} />
             Too much glare — tilt slightly
         </div>
     ),
     dark: (
-        <div className="flex items-center gap-2">
-            <MdDarkMode />
+        <div className="items-center">
+            <MdDarkMode className="mx-auto my-6" size={40} />
             Too dark — find better lighting
         </div>
     ),
@@ -32,19 +32,19 @@ export const GUIDANCE_TEXT: Record<Guidance, JSX.Element | string> = {
 
 export const PHASE_TEXT: Record<ScanPhase, JSX.Element | string> = {
     detecting: (
-        <div className="flex items-center gap-2">
-            Scanning front... <AiOutlineLoading3Quarters />
+        <div className="items-center">
+            Scanning front... <AiOutlineLoading3Quarters className="mx-auto my-6" size={40} />
         </div>
     ),
     front_captured: (
-        <div className="flex items-center gap-2">
-            <GoCheckCircle /> front captured
+        <div className="items-center">
+            <GoCheckCircle className="mx-auto my-6" size={40} /> front captured
         </div>
     ),
     waiting_flip: <div>Now flip the medicine to show the back</div>,
     back_captured: (
-        <div className="flex items-center gap-2">
-            <GoCheckCircle />
+        <div className="items-center">
+            <GoCheckCircle className="mx-auto my-6" size={40} />
             Back captured
         </div>
     ),

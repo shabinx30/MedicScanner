@@ -11,6 +11,7 @@ import { Guidance, ScanPhase } from "@/types/camera.type";
 import { GUIDANCE_TEXT, PHASE_TEXT } from "@/const/camera";
 import { useRouter } from "next/navigation";
 import useScanner from "@/libs/Scanner";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const Camera = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -262,13 +263,13 @@ const Camera = () => {
             >
                 <Link
                     href="/"
-                    className="absolute top-2.5 md:top-7.5 left-2.5 md:left-7.5 z-40 bg-white dark:bg-[#1b1b1b] py-2.5 px-3.5 rounded-2xl"
+                    className={`absolute w-fit top-2.5 md:top-7.5 right-2.5 md:left-7.5 z-40 ${guidance === "glare" ? "bg-black text-white" : guidance === "dark" ? "bg-white text-black" : "bg-white dark:bg-[#1b1b1b]"} py-2.5 px-3.5 rounded-2xl`}
                 >
-                    <IoArrowBackOutline size={25} />
+                    <IoArrowBackOutline className="rotate-90 md:rotate-0" size={25} />
                 </Link>
                 {!isEngineLoaded && (
                     <h3 className="absolute z-30 bottom-1/2 right-1/2 translate-y-1/2 translate-x-1/2">
-                        Loading Camera Engine...
+                        <AiOutlineLoading3Quarters size={24} className="animate-spin" />
                     </h3>
                 )}
                 {readyBtn ? (
@@ -290,11 +291,11 @@ const Camera = () => {
                             </div>
                         </div>
                     ) : (
-                        <div className="absolute bottom-4 z-30 w-screen flex justify-center">
+                        <div className={`absolute ${guidance === "no_object" ? "left-[-5em] items-center overflow-hidden md:justify-center md:items-end md:left-0 md:bottom-4" : "items-center justify-center"} z-30 w-screen h-screen flex`}>
                             <motion.div
                                 layout
                                 transition={{ duration: 0.1, ease: "easeIn" }}
-                                className="bg-white h-fit dark:bg-black text-sm rounded-2xl py-4 px-6"
+                                className={`${guidance === "glare" ? "bg-black text-white" : guidance === "dark" ? "bg-white text-black" : "bg-white dark:bg-black"} rotate-90 md:rotate-0 h-fit will-change-contents rounded-2xl py-4 px-6`}
                             >
                                 {guidance !== "none"
                                     ? GUIDANCE_TEXT[guidance]
@@ -303,11 +304,11 @@ const Camera = () => {
                         </div>
                     )
                 ) : (
-                    <div className="absolute bottom-4 z-30 w-screen flex justify-center">
+                    <div className={`absolute ${guidance === "no_object" ? "left-[-5em] items-center overflow-hidden md:justify-center md:items-end md:left-0 md:bottom-4" : "items-center justify-center"} z-30 w-screen h-screen flex`}>
                         <motion.div
                             layout
                             transition={{ duration: 0.1, ease: "easeIn" }}
-                            className="bg-white h-fit dark:bg-black text-sm rounded-2xl py-4 px-6"
+                            className={`${guidance === "glare" ? "bg-black text-white" : guidance === "dark" ? "bg-white text-black" : "bg-white dark:bg-black"} rotate-90 md:rotate-0 h-fit will-change-contents rounded-2xl py-4 px-6`}
                         >
                             {guidance !== "none"
                                 ? GUIDANCE_TEXT[guidance]
@@ -334,7 +335,9 @@ const Camera = () => {
                 <div
                     className={`absolute w-full h-full z-23 transition-colors duration-300 ${exText.length && exText[0].box ? "bg-black/50" : "bg-transparent"}`}
                 ></div>
-                {exText.length && exText[0].box ? (
+                {exText.length &&
+                exText[0].box &&
+                window.screen.width > window.screen.height ? (
                     <svg className="absolute w-screen h-screen z-24">
                         {exText.map((text: { box: [] }, index: number) => (
                             <g key={index}>
